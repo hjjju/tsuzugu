@@ -3,9 +3,16 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useFormState, useFormStatus } from "react-dom";
 import type { Invitation } from "@/lib/data/invitations";
+import type { Locale } from "@/lib/i18n";
 import { submitRsvp, RsvpFormState } from "./actions";
 
-const RsvpSubmitButton = () => {
+const RsvpSubmitButton = ({
+  label,
+  pendingLabel,
+}: {
+  label: string;
+  pendingLabel: string;
+}) => {
   const { pending } = useFormStatus();
   return (
     <button
@@ -13,12 +20,68 @@ const RsvpSubmitButton = () => {
       className="flex h-11 w-full items-center justify-center rounded-full bg-accent text-sm font-semibold text-white transition-opacity duration-300 hover:opacity-80 disabled:opacity-40"
       disabled={pending}
     >
-      {pending ? "送信中..." : "送信"}
+      {pending ? pendingLabel : label}
     </button>
   );
 };
 
-export default function InviteClient({ invitation }: { invitation: Invitation }) {
+export default function InviteClient({
+  invitation,
+  copy,
+  locale,
+}: {
+  invitation: Invitation;
+  copy: {
+    greetingTitle: string;
+    greetingDefault: string;
+    scheduleTitle: string;
+    dateLabel: string;
+    venueLabel: string;
+    addressLabel: string;
+    rsvpTitle: string;
+    rsvpNoticeFallback: string;
+    rsvpDeadlineLabel: string;
+    nameLabel: string;
+    nameLastPlaceholder: string;
+    nameFirstPlaceholder: string;
+    furiganaLabel: string;
+    furiganaPlaceholder: string;
+    emailLabel: string;
+    attendanceLabel: string;
+    attend: string;
+    decline: string;
+    allergyLabel: string;
+    allergyPlaceholder: string;
+    companionLabel: string;
+    companionPlaceholder: string;
+    shuttleLabel: string;
+    shuttleYes: string;
+    shuttleNo: string;
+    speechLabel: string;
+    speechYes: string;
+    speechNo: string;
+    submit: string;
+    submitPending: string;
+    rsvpThanksTitle: string;
+    rsvpThanksNote: string;
+    qrButton: string;
+    lineSelfShare: string;
+    paypayTitle: string;
+    paypayFallbackNote: string;
+    paypayButton: string;
+    paypayBrideButton: string;
+    paypayGroomButton: string;
+    paypayModalTitle: string;
+    paypayModalEmpty: string;
+    paypayClose: string;
+    qrModalTitle: string;
+    qrModalNote: string;
+    close: string;
+    lineShareText: string;
+    qrAlt: string;
+  };
+  locale: Locale;
+}) {
   const [imageLoaded, setImageLoaded] = useState(false);
   const currentUrl = typeof window !== "undefined" ? window.location.href : "";
   const initialState: RsvpFormState = { errors: {}, message: undefined, qrToken: undefined };
@@ -33,27 +96,27 @@ export default function InviteClient({ invitation }: { invitation: Invitation })
   const rsvpCompanionEnabled = invitation.rsvpCompanionEnabled ?? true;
   const rsvpShuttleEnabled = invitation.rsvpShuttleEnabled ?? false;
   const rsvpSpeechEnabled = invitation.rsvpSpeechEnabled ?? false;
-  const rsvpNotice =
-    invitation.rsvpNotice ||
-    "恐れ入りますが、以下の項目にご記入をお願いいたします。";
+  const rsvpNotice = invitation.rsvpNotice || copy.rsvpNoticeFallback;
+  const intlLocale =
+    locale === "ko" ? "ko-KR" : locale === "en" ? "en-US" : "ja-JP";
 
   const eventDate = useMemo(() => {
     const date = new Date(invitation.dateTimeISO);
-    return new Intl.DateTimeFormat("ja-JP", {
+    return new Intl.DateTimeFormat(intlLocale, {
       year: "numeric",
       month: "long",
       day: "numeric",
       weekday: "short",
     }).format(date);
-  }, [invitation.dateTimeISO]);
+  }, [invitation.dateTimeISO, intlLocale]);
 
   const eventTime = useMemo(() => {
     const date = new Date(invitation.dateTimeISO);
-    return new Intl.DateTimeFormat("ja-JP", {
+    return new Intl.DateTimeFormat(intlLocale, {
       hour: "2-digit",
       minute: "2-digit",
     }).format(date);
-  }, [invitation.dateTimeISO]);
+  }, [invitation.dateTimeISO, intlLocale]);
 
   const qrUrl = state.qrToken
     ? `https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=${state.qrToken}`
@@ -63,23 +126,21 @@ export default function InviteClient({ invitation }: { invitation: Invitation })
     ? `https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(
         currentUrl
       )}&text=${encodeURIComponent(
-        `出欠の回答を控えました。QRコード: ${state.qrToken}`
+        copy.lineShareText.replace("{qrToken}", state.qrToken)
       )}`
     : "";
 
-  const greetingMessage =
-    invitation.messageJP ||
-    "拝啓　春暖の候、皆様にはますますご清祥のこととお慶び申し上げます。\nこのたび結婚式を挙げる運びとなりました。\n日頃お世話になっている皆様に感謝の気持ちを込めて、ささやかな席を設けております。\nご都合がよろしければぜひご列席賜りますようお願い申し上げます。\n敬具";
+  const greetingMessage = invitation.messageJP || copy.greetingDefault;
 
   const deadlineLabel = useMemo(() => {
     if (!invitation.rsvpDeadline) return "";
     const date = new Date(invitation.rsvpDeadline);
-    return new Intl.DateTimeFormat("ja-JP", {
+    return new Intl.DateTimeFormat(intlLocale, {
       year: "numeric",
       month: "long",
       day: "numeric",
     }).format(date);
-  }, [invitation.rsvpDeadline]);
+  }, [invitation.rsvpDeadline, intlLocale]);
 
   const paypaySteps = useMemo(
     () =>
@@ -146,24 +207,24 @@ export default function InviteClient({ invitation }: { invitation: Invitation })
           data-section-index={0}
         >
           <h2 className="font-display text-xl font-semibold text-ink">
-            ご案内
+            {copy.greetingTitle}
           </h2>
           <p className="text-sm leading-relaxed text-ink/70 whitespace-pre-line">
             {greetingMessage}
           </p>
           <div className="grid gap-2 text-sm text-ink/70">
             <div className="flex items-center justify-between">
-              <span>日時</span>
+              <span>{copy.dateLabel}</span>
               <span>
                 {eventDate} {eventTime}
               </span>
             </div>
             <div className="flex items-center justify-between">
-              <span>会場</span>
+              <span>{copy.venueLabel}</span>
               <span>{invitation.venueName}</span>
             </div>
             <div className="flex items-center justify-between">
-              <span>住所</span>
+              <span>{copy.addressLabel}</span>
               <span className="text-right">{invitation.venueAddress}</span>
             </div>
           </div>
@@ -180,14 +241,14 @@ export default function InviteClient({ invitation }: { invitation: Invitation })
         >
           <div className="space-y-2">
             <h2 className="font-display text-lg font-semibold text-ink">
-              ご出欠のご回答
+              {copy.rsvpTitle}
             </h2>
             <p className="text-sm text-ink/70">
               {rsvpNotice}
             </p>
             {deadlineLabel ? (
               <p className="text-xs text-ink/60">
-                ご回答期限: {deadlineLabel}
+                {copy.rsvpDeadlineLabel}: {deadlineLabel}
               </p>
             ) : null}
           </div>
@@ -195,15 +256,15 @@ export default function InviteClient({ invitation }: { invitation: Invitation })
           {state.message && state.qrToken ? (
             <div className="mt-6 text-center">
               <p className="text-base font-semibold text-ink">
-                {state.message}
+                {state.message || copy.rsvpThanksTitle}
               </p>
               <p className="mt-2 text-sm text-ink/70">
-                個別のQRコードをご提示いただくと、受付がスムーズです。
+                {copy.rsvpThanksNote}
               </p>
               <div className="mt-4 flex justify-center">
                 <img
                   src={qrUrl}
-                  alt="入場用QRコード"
+                  alt={copy.qrAlt}
                   className="h-40 w-40 rounded-2xl border border-black/10 bg-white"
                 />
               </div>
@@ -213,34 +274,35 @@ export default function InviteClient({ invitation }: { invitation: Invitation })
                   className="flex h-11 items-center justify-center rounded-full border border-ink/20 text-sm font-medium text-ink"
                   onClick={() => setQrOpen(true)}
                 >
-                  QRコードを表示する
+                  {copy.qrButton}
                 </button>
                 <a
                   href={lineShareUrl}
                   className="flex h-11 items-center justify-center rounded-full border border-ink/20 text-sm font-medium text-ink"
                 >
-                  LINEで自分に送る
+                  {copy.lineSelfShare}
                 </a>
               </div>
             </div>
           ) : (
             <form className="mt-5 space-y-5" action={formAction}>
               <input type="hidden" name="invitationSlug" value={invitation.slug} />
+              <input type="hidden" name="locale" value={locale} />
 
               {rsvpRequireName ? (
                 <div className="space-y-2">
-                  <label className="text-sm text-ink">お名前（姓・名）</label>
+                  <label className="text-sm text-ink">{copy.nameLabel}</label>
                   <div className="grid grid-cols-2 gap-3">
                     <input
                       name="lastName"
                       className="h-11 rounded-2xl border border-ink/15 bg-white/70 px-3 text-sm"
-                      placeholder="姓"
+                      placeholder={copy.nameLastPlaceholder}
                       required
                     />
                     <input
                       name="firstName"
                       className="h-11 rounded-2xl border border-ink/15 bg-white/70 px-3 text-sm"
-                      placeholder="名"
+                      placeholder={copy.nameFirstPlaceholder}
                       required
                     />
                   </div>
@@ -254,11 +316,11 @@ export default function InviteClient({ invitation }: { invitation: Invitation })
 
               {rsvpRequireFurigana ? (
                 <div className="space-y-2">
-                  <label className="text-sm text-ink">フリガナ（セイ・メイ）</label>
+                  <label className="text-sm text-ink">{copy.furiganaLabel}</label>
                   <input
                     name="furigana"
                     className="h-11 w-full rounded-2xl border border-ink/15 bg-white/70 px-3 text-sm"
-                    placeholder="フリガナ"
+                    placeholder={copy.furiganaPlaceholder}
                     required
                   />
                   {state.errors?.furigana && (
@@ -270,7 +332,7 @@ export default function InviteClient({ invitation }: { invitation: Invitation })
               ) : null}
 
               <div className="space-y-2">
-                <label className="text-sm text-ink">メールアドレス</label>
+                <label className="text-sm text-ink">{copy.emailLabel}</label>
                 <input
                   name="email"
                   type="email"
@@ -286,7 +348,7 @@ export default function InviteClient({ invitation }: { invitation: Invitation })
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm text-ink">ご出席 / ご欠席</label>
+                <label className="text-sm text-ink">{copy.attendanceLabel}</label>
                 <div className="flex gap-2">
                   <label className="flex h-11 flex-1 items-center justify-center rounded-full border border-ink/20 text-sm">
                     <input
@@ -296,7 +358,7 @@ export default function InviteClient({ invitation }: { invitation: Invitation })
                       defaultChecked
                       className="mr-2"
                     />
-                    ご出席
+                    {copy.attend}
                   </label>
                   <label className="flex h-11 flex-1 items-center justify-center rounded-full border border-ink/20 text-sm">
                     <input
@@ -305,44 +367,44 @@ export default function InviteClient({ invitation }: { invitation: Invitation })
                       value="decline"
                       className="mr-2"
                     />
-                    ご欠席
+                    {copy.decline}
                   </label>
                 </div>
               </div>
 
               {rsvpAllergyEnabled ? (
                 <div className="space-y-2">
-                  <label className="text-sm text-ink">食物アレルギーの有無・内容</label>
+                  <label className="text-sm text-ink">{copy.allergyLabel}</label>
                   <textarea
                     name="allergyText"
                     className="min-h-[96px] w-full rounded-2xl border border-ink/15 bg-white/70 px-3 py-2 text-sm"
-                    placeholder="差し支えない範囲でご記入ください"
+                    placeholder={copy.allergyPlaceholder}
                   />
                 </div>
               ) : null}
 
               {rsvpCompanionEnabled ? (
                 <div className="space-y-2">
-                  <label className="text-sm text-ink">同伴者氏名（任意）</label>
+                  <label className="text-sm text-ink">{copy.companionLabel}</label>
                   <input
                     name="companionName"
                     className="h-11 w-full rounded-2xl border border-ink/15 bg-white/70 px-3 text-sm"
-                    placeholder="同伴者様のお名前"
+                    placeholder={copy.companionPlaceholder}
                   />
                 </div>
               ) : null}
 
               {rsvpShuttleEnabled ? (
                 <div className="space-y-2">
-                  <label className="text-sm text-ink">送迎バスのご利用有無</label>
+                  <label className="text-sm text-ink">{copy.shuttleLabel}</label>
                   <div className="flex gap-2">
                     <label className="flex h-11 flex-1 items-center justify-center rounded-full border border-ink/20 text-sm">
                       <input type="radio" name="shuttleBus" value="yes" className="mr-2" />
-                      利用する
+                      {copy.shuttleYes}
                     </label>
                     <label className="flex h-11 flex-1 items-center justify-center rounded-full border border-ink/20 text-sm">
                       <input type="radio" name="shuttleBus" value="no" className="mr-2" />
-                      利用しない
+                      {copy.shuttleNo}
                     </label>
                   </div>
                 </div>
@@ -350,21 +412,21 @@ export default function InviteClient({ invitation }: { invitation: Invitation })
 
               {rsvpSpeechEnabled ? (
                 <div className="space-y-2">
-                  <label className="text-sm text-ink">祝辞ご担当の確認</label>
+                  <label className="text-sm text-ink">{copy.speechLabel}</label>
                   <div className="flex gap-2">
                     <label className="flex h-11 flex-1 items-center justify-center rounded-full border border-ink/20 text-sm">
                       <input type="radio" name="speechRole" value="yes" className="mr-2" />
-                      担当する
+                      {copy.speechYes}
                     </label>
                     <label className="flex h-11 flex-1 items-center justify-center rounded-full border border-ink/20 text-sm">
                       <input type="radio" name="speechRole" value="no" className="mr-2" />
-                      担当しない
+                      {copy.speechNo}
                     </label>
                   </div>
                 </div>
               ) : null}
 
-              <RsvpSubmitButton />
+              <RsvpSubmitButton label={copy.submit} pendingLabel={copy.submitPending} />
             </form>
           )}
         </section>
@@ -380,11 +442,11 @@ export default function InviteClient({ invitation }: { invitation: Invitation })
             data-section-index={2}
           >
           <h2 className="font-display text-lg font-semibold text-ink">
-            ご祝儀
+            {copy.paypayTitle}
           </h2>
           <p className="mt-2 text-sm text-ink/70">
             {invitation.paypayNotice ||
-              "手数料なく心をお届けできます。PayPayでの送金をご希望の際にご利用ください。"}
+              copy.paypayFallbackNote}
           </p>
           <div className="mt-4 grid gap-3">
             {paypayBrideLink ? (
@@ -396,7 +458,7 @@ export default function InviteClient({ invitation }: { invitation: Invitation })
                 <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-white text-[10px] font-bold text-[#ff0033]">
                   Pay
                 </span>
-                新婦様へPayPayで送る
+                {copy.paypayBrideButton}
               </button>
             ) : null}
             {paypayGroomLink ? (
@@ -408,7 +470,7 @@ export default function InviteClient({ invitation }: { invitation: Invitation })
                 <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-white text-[10px] font-bold text-[#ff0033]">
                   Pay
                 </span>
-                新郎様へPayPayで送る
+                {copy.paypayGroomButton}
               </button>
             ) : null}
             {!paypayBrideLink && !paypayGroomLink ? (
@@ -417,7 +479,7 @@ export default function InviteClient({ invitation }: { invitation: Invitation })
                 className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-full bg-ink/30 text-sm font-semibold text-white"
                 disabled
               >
-                PayPayで送る
+                {copy.paypayButton}
               </button>
             ) : null}
           </div>
@@ -430,14 +492,14 @@ export default function InviteClient({ invitation }: { invitation: Invitation })
           <div className="w-full max-w-sm rounded-3xl bg-[#f9f8f6] p-6 shadow-xl">
             <div className="flex items-center justify-between">
               <h3 className="font-display text-lg font-semibold text-ink">
-                PayPay送金方法ガイド
+                {copy.paypayModalTitle}
               </h3>
               <button
                 type="button"
                 className="rounded-full border border-ink/15 px-3 py-1 text-xs text-ink/70"
                 onClick={() => setPaypayOpen(false)}
               >
-                閉じる
+                {copy.paypayClose}
               </button>
             </div>
             <div className="mt-4 space-y-2 text-sm text-ink/70">
@@ -446,7 +508,7 @@ export default function InviteClient({ invitation }: { invitation: Invitation })
                   <p key={step}>{index + 1}. {step}</p>
                 ))
               ) : (
-                <p>ご案内文が設定されていません。</p>
+                <p>{copy.paypayModalEmpty}</p>
               )}
             </div>
             <div className="mt-4 grid gap-2">
@@ -455,7 +517,7 @@ export default function InviteClient({ invitation }: { invitation: Invitation })
                   href={paypayBrideLink}
                   className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-full bg-[#ff0033] text-sm font-semibold text-white"
                 >
-                  新婦様へ送る
+                  {copy.paypayBrideButton}
                 </a>
               ) : null}
               {paypayGroomLink ? (
@@ -463,7 +525,7 @@ export default function InviteClient({ invitation }: { invitation: Invitation })
                   href={paypayGroomLink}
                   className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-full bg-[#ff0033] text-sm font-semibold text-white"
                 >
-                  新郎様へ送る
+                  {copy.paypayGroomButton}
                 </a>
               ) : null}
             </div>
@@ -475,15 +537,15 @@ export default function InviteClient({ invitation }: { invitation: Invitation })
         <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/40 px-4">
           <div className="w-full max-w-xs rounded-3xl bg-[#f9f8f6] p-6 text-center shadow-xl">
             <h3 className="font-display text-lg font-semibold text-ink">
-              入場用QRコード
+              {copy.qrModalTitle}
             </h3>
             <p className="mt-2 text-sm text-ink/70">
-              当日は受付でこちらのQRコードをご提示ください。
+              {copy.qrModalNote}
             </p>
             <div className="mt-4 flex justify-center">
               <img
                 src={qrUrl}
-                alt="入場用QRコード"
+                alt={copy.qrAlt}
                 className="h-44 w-44 rounded-2xl border border-black/10 bg-white"
               />
             </div>
@@ -492,7 +554,7 @@ export default function InviteClient({ invitation }: { invitation: Invitation })
               className="mt-4 h-10 w-full rounded-full border border-ink/20 text-sm"
               onClick={() => setQrOpen(false)}
             >
-              閉じる
+              {copy.close}
             </button>
           </div>
         </div>

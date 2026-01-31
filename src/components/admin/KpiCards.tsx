@@ -6,19 +6,25 @@ function countAllergy(rsvps: RSVP[]) {
 
 type KpiCardsProps = {
   rsvps: RSVP[];
+  labels: {
+    total: string;
+    attend: string;
+    decline: string;
+    allergy: string;
+  };
 };
 
-export default function KpiCards({ rsvps }: KpiCardsProps) {
+export default function KpiCards({ rsvps, labels }: KpiCardsProps) {
   const total = rsvps.length;
   const attending = rsvps.filter((item) => item.attendance === "attend").length;
   const declined = rsvps.filter((item) => item.attendance === "decline").length;
   const allergy = countAllergy(rsvps);
 
   const cards = [
-    { label: "総回答", value: total },
-    { label: "出席", value: attending },
-    { label: "欠席", value: declined },
-    { label: "アレルギー", value: allergy },
+    { label: labels.total, value: total },
+    { label: labels.attend, value: attending },
+    { label: labels.decline, value: declined },
+    { label: labels.allergy, value: allergy },
   ];
 
   return (

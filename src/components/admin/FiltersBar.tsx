@@ -9,14 +9,21 @@ type FiltersState = {
 type FiltersBarProps = {
   filters: FiltersState;
   onChange: (filters: FiltersState) => void;
+  labels: {
+    placeholder: string;
+    all: string;
+    attend: string;
+    decline: string;
+    allergyOnly: string;
+  };
 };
 
-export default function FiltersBar({ filters, onChange }: FiltersBarProps) {
+export default function FiltersBar({ filters, onChange, labels }: FiltersBarProps) {
   return (
     <div className="space-y-3 rounded-2xl border border-black/5 bg-white/70 p-4">
       <input
         className="h-11 w-full rounded-2xl border border-ink/15 bg-white/80 px-3 text-sm"
-        placeholder="お名前 / ふりがなで検索"
+        placeholder={labels.placeholder}
         value={filters.query}
         onChange={(event) =>
           onChange({ ...filters, query: event.target.value })
@@ -24,9 +31,9 @@ export default function FiltersBar({ filters, onChange }: FiltersBarProps) {
       />
       <div className="flex flex-wrap gap-2">
         {[
-          { label: "すべて", value: "all" },
-          { label: "出席", value: "attend" },
-          { label: "欠席", value: "decline" },
+          { label: labels.all, value: "all" },
+          { label: labels.attend, value: "attend" },
+          { label: labels.decline, value: "decline" },
         ].map((item) => (
           <button
             key={item.value}
@@ -57,7 +64,7 @@ export default function FiltersBar({ filters, onChange }: FiltersBarProps) {
               : "border-ink/20 text-ink/60"
           }`}
         >
-          アレルギーのみ
+          {labels.allergyOnly}
         </button>
       </div>
     </div>

@@ -1,8 +1,10 @@
 import type { RSVP } from "@/lib/data/rsvps";
+import type { Locale } from "@/lib/i18n";
 
-function formatDate(iso: string) {
+function formatDate(iso: string, locale: Locale) {
   const date = new Date(iso);
-  return new Intl.DateTimeFormat("ja-JP", {
+  const intlLocale = locale === "ko" ? "ko-KR" : locale === "en" ? "en-US" : "ja-JP";
+  return new Intl.DateTimeFormat(intlLocale, {
     month: "numeric",
     day: "numeric",
     hour: "2-digit",
@@ -13,9 +15,30 @@ function formatDate(iso: string) {
 type RsvpTableProps = {
   rsvps: RSVP[];
   checkedInIds: Set<string>;
+  locale: Locale;
+  labels: {
+    attend: string;
+    decline: string;
+    companion: string;
+    guestsUnit: string;
+    allergy: string;
+    message: string;
+    email: string;
+    phone: string;
+    createdAt: string;
+    checkIn: string;
+    checkInDone: string;
+    checkInPending: string;
+    noData: string;
+  };
 };
 
-export default function RsvpTable({ rsvps, checkedInIds }: RsvpTableProps) {
+export default function RsvpTable({
+  rsvps,
+  checkedInIds,
+  locale,
+  labels,
+}: RsvpTableProps) {
   return (
     <div className="space-y-3">
       {rsvps.map((rsvp) => (
@@ -37,30 +60,35 @@ export default function RsvpTable({ rsvps, checkedInIds }: RsvpTableProps) {
                   : "bg-ink/10 text-ink/60"
               }`}
             >
-              {rsvp.attendance === "attend" ? "出席" : "欠席"}
+              {rsvp.attendance === "attend" ? labels.attend : labels.decline}
             </span>
           </div>
           <div className="mt-3 grid gap-2 text-xs text-ink/70">
             <div className="flex justify-between">
-              <span>同伴者</span>
-              <span>{rsvp.guestsCount}名</span>
+              <span>{labels.companion}</span>
+              <span>
+                {rsvp.guestsCount}
+                {labels.guestsUnit}
+              </span>
             </div>
             <div className="flex justify-between">
-              <span>アレルギー</span>
-              <span>{rsvp.allergyText || "なし"}</span>
+              <span>{labels.allergy}</span>
+              <span>{rsvp.allergyText || "-"}</span>
             </div>
             <div className="flex justify-between">
-              <span>メッセージ</span>
+              <span>{labels.message}</span>
               <span className="text-right">{rsvp.messageToCouple || "-"}</span>
             </div>
             <div className="flex justify-between">
-              <span>回答日</span>
-              <span>{formatDate(rsvp.createdAtISO)}</span>
+              <span>{labels.createdAt}</span>
+              <span>{formatDate(rsvp.createdAtISO, locale)}</span>
             </div>
             <div className="flex justify-between">
-              <span>チェックイン</span>
+              <span>{labels.checkIn}</span>
               <span>
-                {checkedInIds.has(rsvp.id) ? "済" : "未"}
+                {checkedInIds.has(rsvp.id)
+                  ? labels.checkInDone
+                  : labels.checkInPending}
               </span>
             </div>
           </div>
@@ -68,7 +96,7 @@ export default function RsvpTable({ rsvps, checkedInIds }: RsvpTableProps) {
       ))}
       {rsvps.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-ink/20 bg-white/60 p-6 text-center text-sm text-ink/60">
-          該当する回答がありません。
+          {labels.noData}
         </div>
       ) : null}
     </div>

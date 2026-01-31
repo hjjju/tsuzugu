@@ -3,6 +3,7 @@
 import { z } from "zod";
 import { createRSVP } from "@/lib/services/rsvps";
 import { getInvitationBySlug } from "@/lib/services/invitations";
+import { getDictionary } from "@/lib/i18n";
 
 export type RsvpFormState = {
   errors?: {
@@ -46,6 +47,7 @@ export async function submitRsvp(
     attendance: z.enum(["attend", "decline"]),
     allergyText: z.string().optional(),
     companionName: z.string().optional(),
+    locale: z.string().optional(),
   });
 
   const validatedFields = schema.safeParse({
@@ -57,6 +59,7 @@ export async function submitRsvp(
     attendance: formData.get("attendance"),
     allergyText: formData.get("allergyText"),
     companionName: formData.get("companionName"),
+    locale: formData.get("locale"),
   });
 
   if (!validatedFields.success) {
@@ -66,6 +69,7 @@ export async function submitRsvp(
   }
 
   try {
+    const dict = getDictionary(validatedFields.data.locale || "ja");
     const rsvp = await createRSVP({
       invitationSlug: validatedFields.data.invitationSlug,
       lastName: validatedFields.data.lastName ?? "",
@@ -78,13 +82,18 @@ export async function submitRsvp(
       guestsCount: validatedFields.data.companionName ? 2 : 1,
     });
     return {
-      message: "축하해 주셔서 감사합니다",
+      message: dict.invite.rsvpThanksTitle,
       qrToken: rsvp.qrToken,
     };
   } catch (error) {
     console.error(error);
+    const dict = getDictionary(
+      typeof formData.get("locale") === "string"
+        ? (formData.get("locale") as string)
+        : "ja"
+    );
     return {
-      message: "エラーが発生しました。もう一度お試しください。",
+      message: dict.invite.rsvpError,
     };
   }
 }

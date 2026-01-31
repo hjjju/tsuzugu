@@ -3,48 +3,8 @@
 import { useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { createInvitation } from "@/lib/services/invitations";
-
-const defaultMessage =
-  "このたび私たちは結婚式を挙げる運びとなりました。\n日頃お世話になっている皆様に感謝の気持ちを込めて、ささやかな席を設けております。\nご都合がよろしければぜひご出席ください。";
-
-const templates = [
-  {
-    key: "classic",
-    name: "Classic White",
-    description: "白とアイボリーの上質感",
-    preview: "/images/invite/sample/hero.jpg",
-    accent: "#C9A77C",
-    text: "#ffffff",
-    overlay: 35,
-    font: "serif",
-    letterY: 68,
-    animation: "fade",
-  },
-  {
-    key: "nature",
-    name: "Nature Green",
-    description: "淡いグリーンと木漏れ日",
-    preview: "/images/invite/sample/gallery-01.jpg",
-    accent: "#7A9B7E",
-    text: "#ffffff",
-    overlay: 25,
-    font: "serif",
-    letterY: 64,
-    animation: "fade",
-  },
-  {
-    key: "modern",
-    name: "Modern Dark",
-    description: "深みのある陰影とモダン",
-    preview: "/images/invite/sample/gallery-02.jpg",
-    accent: "#3A3A3A",
-    text: "#f7f4ef",
-    overlay: 55,
-    font: "sans",
-    letterY: 72,
-    animation: "envelope",
-  },
-];
+import type { Locale } from "@/lib/i18n";
+import { getDictionary } from "@/lib/i18n";
 
 const bgmSamples = [
   {
@@ -126,7 +86,14 @@ const Accordion = ({
   </details>
 );
 
-export default function CreatePage() {
+export default function CreatePage({
+  locale,
+  copy,
+}: {
+  locale?: Locale;
+  copy?: ReturnType<typeof getDictionary>["create"];
+}) {
+  const dict = copy ?? getDictionary(locale ?? "ja").create;
   const [activeTab, setActiveTab] = useState("basic");
   const [brideName, setBrideName] = useState("陽菜");
   const [groomName, setGroomName] = useState("健人");
@@ -154,20 +121,16 @@ export default function CreatePage() {
   const [playingBgm, setPlayingBgm] = useState<string | null>(null);
   const [animationType, setAnimationType] = useState("fade");
   const [animationSpeed, setAnimationSpeed] = useState(600);
-  const [galleryInput, setGalleryInput] = useState(
+  const [galleryInput] = useState(
     "/images/invite/sample/gallery-01.jpg\n/images/invite/sample/gallery-02.jpg\n/images/invite/sample/gallery-03.jpg"
   );
-  const [messageJP, setMessageJP] = useState(defaultMessage);
-  const [paypayReceiveLink, setPaypayReceiveLink] = useState("");
+  const [messageJP, setMessageJP] = useState(dict.defaultMessage);
+  const [paypayReceiveLink] = useState("");
   const [paypayEnabled, setPaypayEnabled] = useState(true);
   const [paypayBrideLink, setPaypayBrideLink] = useState("");
   const [paypayGroomLink, setPaypayGroomLink] = useState("");
-  const [paypayNotice, setPaypayNotice] = useState(
-    "手数料0円で、感謝の気持ちをPayPayで直接お届けいただけます。"
-  );
-  const [paypayGuideText, setPaypayGuideText] = useState(
-    "1. ボタンを押してPayPayの受け取りリンクを開きます。\n2. 金額を入力し、内容をご確認ください。\n3. 送付後、必要に応じて完了画面を保存してください。"
-  );
+  const [paypayNotice, setPaypayNotice] = useState(dict.paypayNoticeDefault);
+  const [paypayGuideText, setPaypayGuideText] = useState(dict.paypayGuideDefault);
   const [createdSlug, setCreatedSlug] = useState<string | null>(null);
   const [submitNotice, setSubmitNotice] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -176,6 +139,12 @@ export default function CreatePage() {
   const [baseUrl] = useState(() =>
     typeof window !== "undefined" ? window.location.origin : ""
   );
+  const [currentLocale] = useState(() => {
+    if (locale) return locale;
+    if (typeof window === "undefined") return "ja";
+    const segment = window.location.pathname.split("/")[1];
+    return segment || "ja";
+  });
   const [rsvpRequireName, setRsvpRequireName] = useState(true);
   const [rsvpRequireFurigana, setRsvpRequireFurigana] = useState(true);
   const [rsvpAllergyEnabled, setRsvpAllergyEnabled] = useState(true);
@@ -183,10 +152,50 @@ export default function CreatePage() {
   const [rsvpShuttleEnabled, setRsvpShuttleEnabled] = useState(false);
   const [rsvpSpeechEnabled, setRsvpSpeechEnabled] = useState(false);
   const [rsvpDeadline, setRsvpDeadline] = useState("2026-05-10");
-  const [rsvpNotice, setRsvpNotice] = useState(
-    "恐れ入りますが、期日までにご回答をお願い申し上げます。"
-  );
+  const [rsvpNotice, setRsvpNotice] = useState(dict.rsvpNoticeDefault);
   const audioRefs = useRef<Record<string, HTMLAudioElement | null>>({});
+
+  const templates = useMemo(
+    () => [
+      {
+        key: "classic",
+        name: dict.templateClassicName,
+        description: dict.templateClassicDesc,
+        preview: "/images/invite/sample/hero.jpg",
+        accent: "#C9A77C",
+        text: "#ffffff",
+        overlay: 35,
+        font: "serif",
+        letterY: 68,
+        animation: "fade",
+      },
+      {
+        key: "nature",
+        name: dict.templateNatureName,
+        description: dict.templateNatureDesc,
+        preview: "/images/invite/sample/gallery-01.jpg",
+        accent: "#7A9B7E",
+        text: "#ffffff",
+        overlay: 25,
+        font: "serif",
+        letterY: 64,
+        animation: "fade",
+      },
+      {
+        key: "modern",
+        name: dict.templateModernName,
+        description: dict.templateModernDesc,
+        preview: "/images/invite/sample/gallery-02.jpg",
+        accent: "#3A3A3A",
+        text: "#f7f4ef",
+        overlay: 55,
+        font: "sans",
+        letterY: 72,
+        animation: "envelope",
+      },
+    ],
+    [dict]
+  );
 
   const galleryImageUrls = useMemo(
     () => normalizeGallery(galleryInput),
@@ -207,7 +216,6 @@ export default function CreatePage() {
 
   const previewImage = heroPreviewUrl || heroImageUrl;
   const objectPosition = `${autoFocus ? 50 : focusX}% ${autoFocus ? 30 : focusY}%`;
-  const activeTemplate = templates.find((item) => item.key === selectedTemplate) || templates[0];
 
   async function handleCreate() {
     setIsSubmitting(true);
@@ -237,7 +245,9 @@ export default function CreatePage() {
         paypayGroomLink: paypayGroomLink || undefined,
         paypayNotice,
         paypayGuideText,
-        lineShareText: `${brideName}と${groomName}の招待状です。ご確認ください。`,
+        lineShareText: dict.lineShareTemplate
+          .replace("{bride}", brideName)
+          .replace("{groom}", groomName),
         rsvpRequireName,
         rsvpRequireFurigana,
         rsvpAllergyEnabled,
@@ -249,11 +259,11 @@ export default function CreatePage() {
       });
 
       setCreatedSlug(invitation.slug);
-      setSubmitNotice("招待状を作成しました。リンクを共有してください。");
+      setSubmitNotice(dict.createSuccess);
       setIsDirty(false);
     } catch (error) {
       console.error(error);
-      setErrorNotice("招待状の作成に失敗しました。");
+      setErrorNotice(dict.createFailure);
     } finally {
       setIsSubmitting(false);
     }
@@ -279,7 +289,7 @@ export default function CreatePage() {
   }
 
   const inviteUrl = createdSlug
-    ? `${baseUrl}/invite/${createdSlug}`
+    ? `${baseUrl}/${currentLocale}/invite/${createdSlug}`
     : undefined;
   const effectivePaypayLink =
     paypayBrideLink || paypayGroomLink || paypayReceiveLink;
@@ -294,10 +304,8 @@ export default function CreatePage() {
         <p className="text-xs uppercase tracking-[0.3em] text-ink/50">
           Tsuzugu Admin
         </p>
-        <h1 className="text-2xl font-semibold text-ink">招待状を作る</h1>
-        <p className="text-sm text-ink/60">
-          丁寧な言葉選びと余白を意識しながら、上質な招待状をお仕立てします。
-        </p>
+        <h1 className="text-2xl font-semibold text-ink">{dict.adminTitle}</h1>
+        <p className="text-sm text-ink/60">{dict.adminSubtitle}</p>
       </header>
 
       <main className="fade-in mt-6 grid gap-6 md:grid-cols-[1.15fr_0.85fr]">
@@ -307,32 +315,32 @@ export default function CreatePage() {
               onClick={() => setActiveTab("basic")}
               active={activeTab === "basic"}
             >
-              基本情報
+              {dict.tabBasic}
             </AdminTab>
             <AdminTab
               onClick={() => setActiveTab("design")}
               active={activeTab === "design"}
             >
-              デザイン
+              {dict.tabDesign}
             </AdminTab>
             <AdminTab
               onClick={() => setActiveTab("rsvp")}
               active={activeTab === "rsvp"}
             >
-              RSVP設定
+              {dict.tabRsvp}
             </AdminTab>
             <AdminTab
               onClick={() => setActiveTab("payment")}
               active={activeTab === "payment"}
             >
-              結済・送金
+              {dict.tabPayment}
             </AdminTab>
           </div>
 
           <div className="space-y-6 p-6">
             {activeTab === "basic" && (
               <div className="space-y-5">
-                <h2 className="text-sm font-semibold text-ink">基本情報</h2>
+                <h2 className="text-sm font-semibold text-ink">{dict.basicTitle}</h2>
                 <div className="grid grid-cols-2 gap-3">
                   <input
                     className="h-11 rounded-xl border border-ink/15 bg-white/80 px-3 text-sm"
@@ -341,7 +349,7 @@ export default function CreatePage() {
                       setBrideName(e.target.value);
                       setIsDirty(true);
                     }}
-                    placeholder="新婦のお名前"
+                    placeholder={dict.brideNamePlaceholder}
                   />
                   <input
                     className="h-11 rounded-xl border border-ink/15 bg-white/80 px-3 text-sm"
@@ -350,11 +358,11 @@ export default function CreatePage() {
                       setGroomName(e.target.value);
                       setIsDirty(true);
                     }}
-                    placeholder="新郎のお名前"
+                    placeholder={dict.groomNamePlaceholder}
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm text-ink">日時</label>
+                  <label className="text-sm text-ink">{dict.dateLabel}</label>
                   <input
                     type="datetime-local"
                     className="w-full h-11 rounded-xl border border-ink/15 bg-white/80 px-3 text-sm"
@@ -366,7 +374,7 @@ export default function CreatePage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm text-ink">会場名</label>
+                  <label className="text-sm text-ink">{dict.venueLabel}</label>
                   <input
                     className="w-full h-11 rounded-xl border border-ink/15 bg-white/80 px-3 text-sm"
                     value={venueName}
@@ -374,11 +382,11 @@ export default function CreatePage() {
                       setVenueName(e.target.value);
                       setIsDirty(true);
                     }}
-                    placeholder="会場名"
+                    placeholder={dict.venueLabel}
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm text-ink">会場住所</label>
+                  <label className="text-sm text-ink">{dict.addressLabel}</label>
                   <input
                     className="w-full h-11 rounded-xl border border-ink/15 bg-white/80 px-3 text-sm"
                     value={venueAddress}
@@ -386,11 +394,11 @@ export default function CreatePage() {
                       setVenueAddress(e.target.value);
                       setIsDirty(true);
                     }}
-                    placeholder="会場住所"
+                    placeholder={dict.addressLabel}
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm text-ink">地図URL</label>
+                  <label className="text-sm text-ink">{dict.mapLabel}</label>
                   <input
                     className="w-full h-11 rounded-xl border border-ink/15 bg-white/80 px-3 text-sm"
                     value={mapEmbedUrl}
@@ -398,16 +406,16 @@ export default function CreatePage() {
                       setMapEmbedUrl(e.target.value);
                       setIsDirty(true);
                     }}
-                    placeholder="Googleマップ埋め込みURL"
+                    placeholder={dict.mapPlaceholder}
                   />
                 </div>
                 <div className="space-y-2">
                   <div className="flex items-start gap-2">
-                    <span className="text-sm text-ink">ご挨拶文</span>
+                    <span className="text-sm text-ink">{dict.greetingLabel}</span>
                     <span
                       className="ml-1 inline-flex h-5 w-5 items-center justify-center rounded-full border border-ink/20 text-[10px] text-ink/60"
-                      title="忌み言葉を避け、感謝とこれからのご縁を丁寧にお伝えください。"
-                      aria-label="忌み言葉を避け、感謝とこれからのご縁を丁寧にお伝えください。"
+                      title={dict.greetingHelp}
+                      aria-label={dict.greetingHelp}
                     >
                       ?
                     </span>
@@ -419,7 +427,7 @@ export default function CreatePage() {
                       setMessageJP(e.target.value);
                       setIsDirty(true);
                     }}
-                    placeholder="招待文"
+                    placeholder={dict.greetingPlaceholder}
                   />
                 </div>
               </div>
@@ -427,18 +435,14 @@ export default function CreatePage() {
 
             {activeTab === "design" && (
               <div className="space-y-5">
-                <p className="text-sm text-ink/60">
-                  日本結婚式では柔らかなベージュとホワイトが信頼感を伝えます。
-                </p>
+                <p className="text-sm text-ink/60">{dict.designNote}</p>
 
-                <Accordion title="テンプレート選択" defaultOpen>
+                <Accordion title={dict.templateTitle} defaultOpen>
                   <div className="flex items-center gap-2 text-xs text-ink/50">
                     <span className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-ink/20 text-[10px]">
                       i
                     </span>
-                    <p>
-                      雰囲気に近いテンプレートを選ぶと、配色と演出が自動で整います。
-                    </p>
+                    <p>{dict.templateHelp}</p>
                   </div>
                   <div className="grid gap-3 md:grid-cols-2">
                     {templates.map((item) => (
@@ -479,17 +483,15 @@ export default function CreatePage() {
                   </div>
                 </Accordion>
 
-                <Accordion title="メインビジュアル" defaultOpen>
+                <Accordion title={dict.visualTitle} defaultOpen>
                   <div className="flex items-center gap-2 text-xs text-ink/50">
                     <span className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-ink/20 text-[10px]">
                       i
                     </span>
-                    <p>
-                      レタリングは写真の明るい部分を避けると読みやすくなります。
-                    </p>
+                    <p>{dict.visualHelp}</p>
                   </div>
                   <div className="space-y-3">
-                    <label className="text-sm text-ink">画像アップロード</label>
+                    <label className="text-sm text-ink">{dict.uploadLabel}</label>
                     <input
                       type="file"
                       accept="image/*"
@@ -503,7 +505,7 @@ export default function CreatePage() {
                         }
                       }}
                     />
-                    <label className="text-sm text-ink">画像URL</label>
+                    <label className="text-sm text-ink">{dict.imageUrlLabel}</label>
                     <input
                       className="w-full h-11 rounded-xl border border-ink/15 bg-white/80 px-3 text-sm"
                       value={heroImageUrl}
@@ -513,7 +515,7 @@ export default function CreatePage() {
                         setIsDirty(true);
                       }}
                     />
-                    <label className="text-sm text-ink">レタリング文言</label>
+                    <label className="text-sm text-ink">{dict.letteringLabel}</label>
                     <input
                       className="w-full h-11 rounded-xl border border-ink/15 bg-white/80 px-3 text-sm"
                       value={mainVisualText}
@@ -523,7 +525,9 @@ export default function CreatePage() {
                       }}
                     />
                     <div className="space-y-2">
-                      <label className="text-xs text-ink/60">レタリング位置</label>
+                      <label className="text-xs text-ink/60">
+                        {dict.letteringPositionLabel}
+                      </label>
                       <input
                         type="range"
                         min={10}
@@ -537,7 +541,7 @@ export default function CreatePage() {
                       />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-xs text-ink/60">テキストカラー</label>
+                      <label className="text-xs text-ink/60">{dict.textColorLabel}</label>
                       <input
                         type="color"
                         value={textColor}
@@ -550,7 +554,7 @@ export default function CreatePage() {
                     </div>
                     <div className="space-y-2 rounded-xl border border-ink/10 bg-white/70 p-3">
                       <label className="flex items-center justify-between text-xs text-ink/60">
-                        <span>自動フォーカス</span>
+                        <span>{dict.autoFocusLabel}</span>
                         <input
                           type="checkbox"
                           checked={autoFocus}
@@ -565,7 +569,9 @@ export default function CreatePage() {
                         />
                       </label>
                       <div className="space-y-2">
-                        <label className="text-[11px] text-ink/50">フォーカス位置（左右）</label>
+                        <label className="text-[11px] text-ink/50">
+                          {dict.focusXLabel}
+                        </label>
                         <input
                           type="range"
                           min={0}
@@ -580,7 +586,9 @@ export default function CreatePage() {
                         />
                       </div>
                       <div className="space-y-2">
-                        <label className="text-[11px] text-ink/50">フォーカス位置（上下）</label>
+                        <label className="text-[11px] text-ink/50">
+                          {dict.focusYLabel}
+                        </label>
                         <input
                           type="range"
                           min={0}
@@ -598,15 +606,15 @@ export default function CreatePage() {
                   </div>
                 </Accordion>
 
-                <Accordion title="フォント・カラー">
+                <Accordion title={dict.fontColorTitle}>
                   <div className="flex items-center gap-2 text-xs text-ink/50">
                     <span className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-ink/20 text-[10px]">
                       i
                     </span>
-                    <p>明朝体は格調高く、ゴシック体は読みやすく整います。</p>
+                    <p>{dict.fontLabel}</p>
                   </div>
                   <div className="grid gap-3">
-                    <label className="text-sm text-ink">フォント設定</label>
+                    <label className="text-sm text-ink">{dict.fontLabel}</label>
                     <select
                       className="h-11 rounded-xl border border-ink/15 bg-white/80 px-3 text-sm"
                       value={fontStyle}
@@ -615,10 +623,10 @@ export default function CreatePage() {
                         setIsDirty(true);
                       }}
                     >
-                      <option value="serif">明朝体（上品）</option>
-                      <option value="sans">ゴシック体（読みやすい）</option>
+                      <option value="serif">{dict.fontSerif}</option>
+                      <option value="sans">{dict.fontSans}</option>
                     </select>
-                    <label className="text-sm text-ink">アクセントカラー</label>
+                    <label className="text-sm text-ink">{dict.accentLabel}</label>
                     <input
                       type="color"
                       value={accentColor}
@@ -628,7 +636,7 @@ export default function CreatePage() {
                       }}
                       className="h-11 w-full rounded-xl border border-ink/15 bg-white/80 p-2"
                     />
-                    <label className="text-sm text-ink">オーバーレイ濃度</label>
+                    <label className="text-sm text-ink">{dict.overlayLabel}</label>
                     <input
                       type="range"
                       min={0}
@@ -643,10 +651,10 @@ export default function CreatePage() {
                   </div>
                 </Accordion>
 
-                <Accordion title="自動フォーカス">
+                <Accordion title={dict.autoFocusTitle}>
                   <div className="space-y-3">
                     <label className="flex items-center justify-between text-sm text-ink">
-                      <span>自動フォーカス</span>
+                      <span>{dict.autoFocusLabel}</span>
                       <input
                         type="checkbox"
                         checked={autoFocus}
@@ -661,7 +669,7 @@ export default function CreatePage() {
                       />
                     </label>
                     <div className="space-y-2">
-                      <label className="text-xs text-ink/60">フォーカス位置（左右）</label>
+                      <label className="text-xs text-ink/60">{dict.focusXLabel}</label>
                       <input
                         type="range"
                         min={0}
@@ -676,7 +684,7 @@ export default function CreatePage() {
                       />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-xs text-ink/60">フォーカス位置（上下）</label>
+                      <label className="text-xs text-ink/60">{dict.focusYLabel}</label>
                       <input
                         type="range"
                         min={0}
@@ -693,15 +701,15 @@ export default function CreatePage() {
                   </div>
                 </Accordion>
 
-                <Accordion title="BGM">
+                <Accordion title={dict.bgmTitle}>
                   <div className="flex items-center gap-2 text-xs text-ink/50">
                     <span className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-ink/20 text-[10px]">
                       i
                     </span>
-                    <p>受け取った方の環境に配慮し、控えめな音量を推奨します。</p>
+                    <p>{dict.bgmHelp}</p>
                   </div>
                   <div className="space-y-3">
-                    <label className="text-sm text-ink">サンプルBGM</label>
+                    <label className="text-sm text-ink">{dict.bgmSampleLabel}</label>
                     <div className="space-y-2">
                       {bgmSamples.map((bgm) => (
                         <div
@@ -722,7 +730,7 @@ export default function CreatePage() {
                               className="rounded-full border border-ink/15 px-3 py-1 text-xs"
                               onClick={() => handlePreviewBgm(bgm.id)}
                             >
-                              {playingBgm === bgm.id ? "停止" : "試聴"}
+                              {playingBgm === bgm.id ? dict.bgmStop : dict.bgmPreview}
                             </button>
                             <button
                               type="button"
@@ -732,7 +740,7 @@ export default function CreatePage() {
                               }}
                               className="rounded-full border border-ink/15 px-3 py-1 text-xs"
                             >
-                              選択
+                              {dict.bgmSelect}
                             </button>
                           </div>
                           <audio
@@ -749,15 +757,15 @@ export default function CreatePage() {
                   </div>
                 </Accordion>
 
-                <Accordion title="アニメーション">
+                <Accordion title={dict.animationTitle}>
                   <div className="flex items-center gap-2 text-xs text-ink/50">
                     <span className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-ink/20 text-[10px]">
                       i
                     </span>
-                    <p>余白のある演出ほど上品に見える傾向があります。</p>
+                    <p>{dict.animationHelp}</p>
                   </div>
                   <div className="space-y-3">
-                    <label className="text-sm text-ink">演出</label>
+                    <label className="text-sm text-ink">{dict.animationLabel}</label>
                     <select
                       className="h-11 rounded-xl border border-ink/15 bg-white/80 px-3 text-sm"
                       value={animationType}
@@ -766,10 +774,10 @@ export default function CreatePage() {
                         setIsDirty(true);
                       }}
                     >
-                      <option value="fade">テキストフェード</option>
-                      <option value="envelope">封筒が開く演出</option>
+                      <option value="fade">{dict.animationFade}</option>
+                      <option value="envelope">{dict.animationEnvelope}</option>
                     </select>
-                    <label className="text-sm text-ink">フェード速度</label>
+                    <label className="text-sm text-ink">{dict.animationSpeed}</label>
                     <input
                       type="range"
                       min={200}
@@ -788,13 +796,11 @@ export default function CreatePage() {
 
             {activeTab === "rsvp" && (
               <div className="space-y-4">
-                <h2 className="text-sm font-semibold text-ink">RSVP設定</h2>
-                <p className="text-sm text-ink/70">
-                  招待状に表示される出欠フォームの項目を設定します。
-                </p>
+                <h2 className="text-sm font-semibold text-ink">{dict.rsvpTitle}</h2>
+                <p className="text-sm text-ink/70">{dict.rsvpDescription}</p>
                 <div className="space-y-3 rounded-2xl bg-white/60 p-4">
                   <label className="flex items-center justify-between text-sm">
-                    <span>お名前（姓・名）を必須にする</span>
+                    <span>{dict.rsvpRequireName}</span>
                     <input
                       type="checkbox"
                       checked={rsvpRequireName}
@@ -805,7 +811,7 @@ export default function CreatePage() {
                     />
                   </label>
                   <label className="flex items-center justify-between text-sm">
-                    <span>フリガナ（セイ・メイ）を必須にする</span>
+                    <span>{dict.rsvpRequireFurigana}</span>
                     <input
                       type="checkbox"
                       checked={rsvpRequireFurigana}
@@ -816,7 +822,7 @@ export default function CreatePage() {
                     />
                   </label>
                   <label className="flex items-center justify-between text-sm">
-                    <span>食物アレルギーの確認を表示</span>
+                    <span>{dict.rsvpAllergy}</span>
                     <input
                       type="checkbox"
                       checked={rsvpAllergyEnabled}
@@ -827,7 +833,7 @@ export default function CreatePage() {
                     />
                   </label>
                   <label className="flex items-center justify-between text-sm">
-                    <span>同伴者氏名の記入欄を表示</span>
+                    <span>{dict.rsvpCompanion}</span>
                     <input
                       type="checkbox"
                       checked={rsvpCompanionEnabled}
@@ -838,7 +844,7 @@ export default function CreatePage() {
                     />
                   </label>
                   <label className="flex items-center justify-between text-sm">
-                    <span>送迎バスご利用の確認</span>
+                    <span>{dict.rsvpShuttle}</span>
                     <input
                       type="checkbox"
                       checked={rsvpShuttleEnabled}
@@ -849,7 +855,7 @@ export default function CreatePage() {
                     />
                   </label>
                   <label className="flex items-center justify-between text-sm">
-                    <span>祝辞ご担当の確認</span>
+                    <span>{dict.rsvpSpeech}</span>
                     <input
                       type="checkbox"
                       checked={rsvpSpeechEnabled}
@@ -861,7 +867,7 @@ export default function CreatePage() {
                   </label>
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm text-ink">回答期限</label>
+                  <label className="text-sm text-ink">{dict.rsvpDeadlineLabel}</label>
                   <input
                     type="date"
                     className="h-11 w-full rounded-xl border border-ink/15 bg-white/80 px-3 text-sm"
@@ -873,7 +879,7 @@ export default function CreatePage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm text-ink">ご案内文</label>
+                  <label className="text-sm text-ink">{dict.rsvpNoticeLabel}</label>
                   <textarea
                     className="min-h-[100px] w-full rounded-xl border border-ink/15 bg-white/80 px-3 py-2 text-sm"
                     value={rsvpNotice}
@@ -884,20 +890,18 @@ export default function CreatePage() {
                   />
                 </div>
                 <div className="text-xs text-ink/60">
-                  日本の式では柔らかなベージュとホワイトが信頼感を与えます。
+                  {dict.rsvpNote}
                 </div>
               </div>
             )}
 
             {activeTab === "payment" && (
               <div className="space-y-4">
-                <h2 className="text-sm font-semibold text-ink">結済・送金設定</h2>
-                <p className="text-sm text-ink/70">
-                  PayPayの受け取りリンクを設定すると、招待状に送金ボタンが表示されます。
-                </p>
+                <h2 className="text-sm font-semibold text-ink">{dict.paymentTitle}</h2>
+                <p className="text-sm text-ink/70">{dict.paymentDescription}</p>
                 <div className="rounded-2xl bg-white/70 p-4 space-y-3">
                   <label className="flex items-center justify-between text-sm">
-                    <span>事前ご祝儀のご案内を表示</span>
+                    <span>{dict.paymentEnable}</span>
                     <input
                       type="checkbox"
                       checked={paypayEnabled}
@@ -908,7 +912,7 @@ export default function CreatePage() {
                     />
                   </label>
                   <div className="space-y-2">
-                    <label className="text-sm text-ink">新婦様 PayPay受け取りリンク</label>
+                    <label className="text-sm text-ink">{dict.paypayBrideLabel}</label>
                     <input
                       className="w-full h-11 rounded-xl border border-ink/15 bg-white/80 px-3 text-sm"
                       value={paypayBrideLink}
@@ -920,7 +924,7 @@ export default function CreatePage() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-sm text-ink">新郎様 PayPay受け取りリンク</label>
+                    <label className="text-sm text-ink">{dict.paypayGroomLabel}</label>
                     <input
                       className="w-full h-11 rounded-xl border border-ink/15 bg-white/80 px-3 text-sm"
                       value={paypayGroomLink}
@@ -933,7 +937,7 @@ export default function CreatePage() {
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm text-ink">手数料0円のご案内文</label>
+                  <label className="text-sm text-ink">{dict.paypayNoticeLabel}</label>
                   <textarea
                     className="min-h-[90px] w-full rounded-xl border border-ink/15 bg-white/80 px-3 py-2 text-sm"
                     value={paypayNotice}
@@ -944,9 +948,7 @@ export default function CreatePage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm text-ink">
-                    PayPay送金方法ガイド（改行区切り）
-                  </label>
+                  <label className="text-sm text-ink">{dict.paypayGuideLabel}</label>
                   <textarea
                     className="min-h-[120px] w-full rounded-xl border border-ink/15 bg-white/80 px-3 py-2 text-sm"
                     value={paypayGuideText}
@@ -957,7 +959,7 @@ export default function CreatePage() {
                   />
                 </div>
                 <div className="text-xs text-ink/60">
-                  ご祝儀は任意である旨を添え、当日のお持ち込みも可能であることを丁寧に記載します。
+                  {dict.paymentNote}
                 </div>
               </div>
             )}
@@ -965,7 +967,7 @@ export default function CreatePage() {
         </section>
 
         <aside className="tsz-card p-5 md:sticky md:top-24">
-          <h2 className="text-sm font-semibold text-ink">モバイルプレビュー</h2>
+          <h2 className="text-sm font-semibold text-ink">{dict.previewTitle}</h2>
           <div className="mt-4 flex justify-center">
             <div className="relative w-[260px] rounded-[36px] border border-black/10 bg-black/5 p-3 shadow-sm">
               <div className="overflow-hidden rounded-[28px] bg-white">
@@ -976,7 +978,7 @@ export default function CreatePage() {
                   />
                   <img
                     src={previewImage}
-                    alt="招待状メインビジュアル"
+                    alt={dict.previewHeroAlt}
                     className="h-full w-full object-cover"
                     style={{ objectPosition }}
                   />
@@ -1023,42 +1025,42 @@ export default function CreatePage() {
                     className="mt-2 w-full rounded-full py-2 text-xs font-semibold"
                     style={{ backgroundColor: accentColor, color: "#fff" }}
                   >
-                    ご出欠の回答へ
+                    {dict.previewButton}
                   </button>
                   <div className="space-y-2 pt-3">
                     <p className="text-[11px] text-ink/60">{rsvpNotice}</p>
                     <p className="text-[11px] text-ink/50">
-                      ご回答期限: {rsvpDeadline}
+                      {dict.previewDeadlineLabel}: {rsvpDeadline}
                     </p>
                     <div className="grid gap-2">
                       {rsvpRequireName ? (
                         <div className="h-8 rounded-lg border border-ink/10 bg-white/60 text-[10px] text-ink/50 px-2 py-1">
-                          お名前（姓・名）
+                          {dict.previewNameLabel}
                         </div>
                       ) : null}
                       {rsvpRequireFurigana ? (
                         <div className="h-8 rounded-lg border border-ink/10 bg-white/60 text-[10px] text-ink/50 px-2 py-1">
-                          フリガナ（セイ・メイ）
+                          {dict.previewFuriganaLabel}
                         </div>
                       ) : null}
                       {rsvpAllergyEnabled ? (
                         <div className="h-10 rounded-lg border border-ink/10 bg-white/60 text-[10px] text-ink/50 px-2 py-1">
-                          食物アレルギーの有無・内容
+                          {dict.previewAllergyLabel}
                         </div>
                       ) : null}
                       {rsvpCompanionEnabled ? (
                         <div className="h-8 rounded-lg border border-ink/10 bg-white/60 text-[10px] text-ink/50 px-2 py-1">
-                          同伴者氏名（任意）
+                          {dict.previewCompanionLabel}
                         </div>
                       ) : null}
                       {rsvpShuttleEnabled ? (
                         <div className="h-8 rounded-lg border border-ink/10 bg-white/60 text-[10px] text-ink/50 px-2 py-1">
-                          送迎バスのご利用有無
+                          {dict.previewShuttleLabel}
                         </div>
                       ) : null}
                       {rsvpSpeechEnabled ? (
                         <div className="h-8 rounded-lg border border-ink/10 bg-white/60 text-[10px] text-ink/50 px-2 py-1">
-                          祝辞ご担当の確認
+                          {dict.previewSpeechLabel}
                         </div>
                       ) : null}
                     </div>
@@ -1075,12 +1077,12 @@ export default function CreatePage() {
                       <span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-white text-[8px] font-bold text-[#ff0033]">
                         Pay
                       </span>
-                      PayPayで送る
+                      {dict.paypayButton}
                     </button>
                     {paypaySteps.length ? (
                       <div className="mt-2 space-y-1 rounded-lg border border-ink/10 bg-white/70 p-2 text-[9px] text-ink/60">
                         <p className="font-semibold text-ink/70">
-                          PayPay送金方法ガイド
+                          {dict.paypayGuideTitle}
                         </p>
                         {paypaySteps.map((step, index) => (
                           <p key={step}>{index + 1}. {step}</p>
@@ -1091,7 +1093,7 @@ export default function CreatePage() {
                 ) : null}
               </div>
               <div className="absolute left-1/2 top-1 -translate-x-1/2 rounded-full bg-black/30 px-4 py-1 text-[10px] text-white/80">
-                iPhone Preview
+                {dict.previewTitle}
               </div>
             </div>
           </div>
@@ -1105,7 +1107,7 @@ export default function CreatePage() {
           className="tsz-button-primary w-full h-12 disabled:opacity-40"
           disabled={isSubmitting}
         >
-          {isSubmitting ? "作成中..." : "招待状を作成する"}
+          {isSubmitting ? dict.creating : dict.createButton}
         </button>
       </div>
 
@@ -1123,7 +1125,7 @@ export default function CreatePage() {
               target="_blank"
               className="rounded-full bg-white shadow-sm border border-ink/10 px-4 py-2 text-xs font-semibold text-ink"
             >
-              プレビュー
+              {dict.previewLink}
             </Link>
           </div>
         </div>
@@ -1131,7 +1133,7 @@ export default function CreatePage() {
 
       {isDirty ? (
         <div className="fixed bottom-4 left-1/2 z-30 w-[92%] -translate-x-1/2 rounded-full bg-ink px-4 py-3 text-center text-xs font-medium text-white shadow-lg">
-          保存されていない変更があります
+          {dict.unsaved}
         </div>
       ) : null}
     </div>

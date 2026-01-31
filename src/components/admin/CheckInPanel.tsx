@@ -3,11 +3,17 @@ import { useState } from "react";
 type CheckInPanelProps = {
   onCheckIn: (qrToken: string) => Promise<boolean>;
   toastMessage?: string | null;
+  labels: {
+    title: string;
+    placeholder: string;
+    button: string;
+  };
 };
 
 export default function CheckInPanel({
   onCheckIn,
   toastMessage,
+  labels,
 }: CheckInPanelProps) {
   const [qrToken, setQrToken] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -24,7 +30,7 @@ export default function CheckInPanel({
   return (
     <div className="rounded-2xl border border-black/5 bg-white/70 p-4">
       <div className="flex items-center justify-between">
-        <p className="text-sm font-semibold text-ink">QRチェックイン</p>
+        <p className="text-sm font-semibold text-ink">{labels.title}</p>
         {toastMessage ? (
           <span className="rounded-full bg-ink/10 px-3 py-1 text-xs text-ink/70">
             {toastMessage}
@@ -34,7 +40,7 @@ export default function CheckInPanel({
       <form className="mt-3 flex gap-2" onSubmit={handleSubmit}>
         <input
           className="h-11 flex-1 rounded-2xl border border-ink/15 bg-white/80 px-3 text-sm"
-          placeholder="QRトークンを入力"
+          placeholder={labels.placeholder}
           value={qrToken}
           onChange={(event) => setQrToken(event.target.value)}
         />
@@ -43,7 +49,7 @@ export default function CheckInPanel({
           className="h-11 rounded-2xl bg-accent px-4 text-sm font-semibold text-white transition-opacity duration-300 hover:opacity-80 disabled:opacity-40"
           disabled={isSubmitting}
         >
-          チェックイン
+          {labels.button}
         </button>
       </form>
     </div>

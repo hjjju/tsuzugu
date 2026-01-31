@@ -8,24 +8,17 @@ function formatCsvField(value: string | number) {
   return stringValue;
 }
 
-function createCsvContent(rows: RSVP[]) {
-  const header = [
-    "姓",
-    "名",
-    "ふりがな",
-    "出欠",
-    "同伴者",
-    "アレルギー",
-    "メッセージ",
-    "メール",
-    "電話",
-    "回答日時",
-  ];
+function createCsvContent(
+  rows: RSVP[],
+  headers: string[],
+  labels: { attend: string; decline: string }
+) {
+  const header = headers;
   const lines = rows.map((row) => [
     row.lastName,
     row.firstName,
     row.furigana,
-    row.attendance === "attend" ? "出席" : "欠席",
+    row.attendance === "attend" ? labels.attend : labels.decline,
     row.guestsCount,
     row.allergyText,
     row.messageToCouple,
@@ -41,11 +34,23 @@ function createCsvContent(rows: RSVP[]) {
 type CsvExportButtonProps = {
   rsvps: RSVP[];
   filename: string;
+  label: string;
+  headers: string[];
+  attendanceLabels: {
+    attend: string;
+    decline: string;
+  };
 };
 
-export default function CsvExportButton({ rsvps, filename }: CsvExportButtonProps) {
+export default function CsvExportButton({
+  rsvps,
+  filename,
+  label,
+  headers,
+  attendanceLabels,
+}: CsvExportButtonProps) {
   function handleExport() {
-    const csv = createCsvContent(rsvps);
+    const csv = createCsvContent(rsvps, headers, attendanceLabels);
     const bom = "\uFEFF";
     const blob = new Blob([bom + csv], {
       type: "text/csv;charset=utf-8;",
@@ -66,7 +71,7 @@ export default function CsvExportButton({ rsvps, filename }: CsvExportButtonProp
       onClick={handleExport}
       className="flex h-11 items-center justify-center rounded-full border border-ink/20 bg-white px-4 text-sm font-medium text-ink transition-opacity duration-300 hover:opacity-80"
     >
-      CSVを書き出す
+      {label}
     </button>
   );
 }
