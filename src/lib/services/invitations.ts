@@ -1,6 +1,7 @@
 import type { Invitation } from "@/lib/data/invitations";
 import { isFirebaseConfigReady } from "@/lib/firebase/config";
 import { getFirebaseDb } from "@/lib/firebase/client";
+type Firestore = unknown;
 
 export type CreateInvitationInput = Omit<Invitation, "slug"> & {
   slug?: string;
@@ -10,8 +11,22 @@ function normalizeSlug(baseSlug: string) {
   return baseSlug.trim() || "invite";
 }
 
+function dynamicImport(modulePath: string) {
+  const importer = new Function(
+    "modulePath",
+    "return import(modulePath)"
+  ) as (path: string) => Promise<unknown>;
+  return importer(modulePath);
+}
+
 async function getFirestoreModule() {
-  return import(/* webpackIgnore: true */ "firebase/firestore");
+  return dynamicImport("firebase/firestore") as Promise<{
+    collection: (db: Firestore, path: string) => unknown;
+    doc: (db: Firestore, path: string, id?: string) => unknown;
+    getDoc: (ref: unknown) => Promise<{ exists: () => boolean; data: () => unknown }>;
+    getDocs: (ref: unknown) => Promise<{ docs: { data: () => unknown }[] }>;
+    setDoc: (ref: unknown, data: unknown) => Promise<void>;
+  }>;
 }
 
 async function getDb() {
@@ -46,10 +61,10 @@ function getDemoInvitation(): Invitation {
 }
 
 async function resolveUniqueSlug(baseSlug: string) {
-  const firebaseDb = await getDb();
+  const firebaseDb = (await getDb()) as Firestore;
   const normalized = normalizeSlug(baseSlug);
   const { doc, getDoc } = await getFirestoreModule();
-  const inviteRef = doc(firebaseDb as any, "invitations", normalized);
+  const inviteRef = doc(firebaseDb, "invitations", normalized);
   const snapshot = await getDoc(inviteRef);
   if (!snapshot.exists()) {
     return normalized;
@@ -59,7 +74,7 @@ async function resolveUniqueSlug(baseSlug: string) {
   while (candidate) {
     counter += 1;
     candidate = `${normalized}-${counter}`;
-    const checkRef = doc(firebaseDb as any, "invitations", candidate);
+    const checkRef = doc(firebaseDb, "invitations", candidate);
     const checkSnapshot = await getDoc(checkRef);
     if (!checkSnapshot.exists()) {
       return candidate;
@@ -72,9 +87,9 @@ export async function listInvitations(): Promise<Invitation[]> {
   if (!isFirebaseConfigReady) {
     return [getDemoInvitation()];
   }
-  const firebaseDb = await getDb();
+  const firebaseDb = (await getDb()) as Firestore;
   const { collection, getDocs } = await getFirestoreModule();
-  const snapshot = await getDocs(collection(firebaseDb as any, "invitations"));
+  const snapshot = await getDocs(collection(firebaseDb, "invitations"));
   return snapshot.docs.map((docSnap) => docSnap.data() as Invitation);
 }
 
@@ -84,9 +99,9 @@ export async function getInvitationBySlug(
   if (!isFirebaseConfigReady) {
     return slug === "demo" ? getDemoInvitation() : undefined;
   }
-  const firebaseDb = await getDb();
+  const firebaseDb = (await getDb()) as Firestore;
   const { doc, getDoc } = await getFirestoreModule();
-  const snapshot = await getDoc(doc(firebaseDb as any, "invitations", slug));
+  const snapshot = await getDoc(doc(firebaseDb, "invitations", slug));
   if (snapshot.exists()) {
     return snapshot.data() as Invitation;
   }
@@ -103,13 +118,13 @@ export async function createInvitation(
       slug,
     };
   }
-  const firebaseDb = await getDb();
+  const firebaseDb = (await getDb()) as Firestore;
   const { doc, setDoc } = await getFirestoreModule();
   const slug = await resolveUniqueSlug(input.slug ?? "invite");
   const newInvitation: Invitation = {
     ...input,
     slug,
   };
-  await setDoc(doc(firebaseDb as any, "invitations", slug), newInvitation);
+  await setDoc(doc(firebaseDb, "invitations", slug), newInvitation);
   return newInvitation;
 }

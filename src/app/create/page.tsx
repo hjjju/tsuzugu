@@ -75,6 +75,8 @@ export default function CreatePage() {
   const [paypayReceiveLink, setPaypayReceiveLink] = useState("");
   const [createdSlug, setCreatedSlug] = useState<string | null>(null);
   const [submitNotice, setSubmitNotice] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorNotice, setErrorNotice] = useState<string | null>(null);
   const [baseUrl] = useState(() =>
     typeof window !== "undefined" ? window.location.origin : ""
   );
@@ -99,30 +101,39 @@ export default function CreatePage() {
     }).format(date);
   }, [dateTimeISO]);
 
-  function handleCreate() {
+  async function handleCreate() {
+    setIsSubmitting(true);
+    setErrorNotice(null);
     const slugBase = generateSlug(brideName, groomName);
-    const invitation = createInvitation({
-      slug: slugBase,
-      brideName,
-      groomName,
-      dateTimeISO: new Date(dateTimeISO).toISOString(),
-      venueName,
-      venueAddress,
-      heroImageUrl,
-      galleryImageUrls,
-      messageJP,
-      scheduleItems: [
-        { time: "15:00", label: "受付開始" },
-        { time: "16:00", label: "挙式" },
-        { time: "17:00", label: "披露宴" },
-      ],
-      mapEmbedUrl: "",
-      paypayReceiveLink: paypayReceiveLink || undefined,
-      lineShareText: `${brideName}と${groomName}の招待状です。ご確認ください。`,
-    });
+    try {
+      const invitation = await createInvitation({
+        slug: slugBase,
+        brideName,
+        groomName,
+        dateTimeISO: new Date(dateTimeISO).toISOString(),
+        venueName,
+        venueAddress,
+        heroImageUrl,
+        galleryImageUrls,
+        messageJP,
+        scheduleItems: [
+          { time: "15:00", label: "受付開始" },
+          { time: "16:00", label: "挙式" },
+          { time: "17:00", label: "披露宴" },
+        ],
+        mapEmbedUrl: "",
+        paypayReceiveLink: paypayReceiveLink || undefined,
+        lineShareText: `${brideName}と${groomName}の招待状です。ご確認ください。`,
+      });
 
-    setCreatedSlug(invitation.slug);
-    setSubmitNotice("招待状を作成しました。リンクを共有してください。");
+      setCreatedSlug(invitation.slug);
+      setSubmitNotice("招待状を作成しました。リンクを共有してください。");
+    } catch (error) {
+      console.error(error);
+      setErrorNotice("招待状の作成に失敗しました。");
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   const inviteUrl = createdSlug
@@ -217,10 +228,14 @@ export default function CreatePage() {
         <button
           type="button"
           onClick={handleCreate}
-          className="flex h-11 items-center justify-center rounded-full bg-accent text-sm font-semibold text-white transition-opacity duration-300 hover:opacity-80"
+          className="flex h-11 items-center justify-center rounded-full bg-accent text-sm font-semibold text-white transition-opacity duration-300 hover:opacity-80 disabled:opacity-40"
+          disabled={isSubmitting}
         >
-          招待状を作成
+          {isSubmitting ? "作成中..." : "招待状を作成"}
         </button>
+        {errorNotice ? (
+          <p className="text-sm text-ink/60">{errorNotice}</p>
+        ) : null}
         {submitNotice ? (
           <div className="rounded-2xl border border-accent/30 bg-accent/10 p-4 text-sm text-ink">
             <p className="font-semibold">{submitNotice}</p>

@@ -1,14 +1,31 @@
 import { firebaseConfig, isFirebaseConfigReady } from "@/lib/firebase/config";
 
-let firebaseApp: unknown | null = null;
-let firebaseDb: unknown | null = null;
+type FirebaseApp = unknown;
+type Firestore = unknown;
+
+let firebaseApp: FirebaseApp | null = null;
+let firebaseDb: Firestore | null = null;
+
+function dynamicImport(modulePath: string) {
+  const importer = new Function(
+    "modulePath",
+    "return import(modulePath)"
+  ) as (path: string) => Promise<unknown>;
+  return importer(modulePath);
+}
 
 async function loadFirebaseAppModule() {
-  return import(/* webpackIgnore: true */ "firebase/app");
+  return dynamicImport("firebase/app") as Promise<{
+    initializeApp: (config: typeof firebaseConfig) => FirebaseApp;
+    getApp: () => FirebaseApp;
+    getApps: () => FirebaseApp[];
+  }>;
 }
 
 async function loadFirestoreModule() {
-  return import(/* webpackIgnore: true */ "firebase/firestore");
+  return dynamicImport("firebase/firestore") as Promise<{
+    getFirestore: (app: FirebaseApp) => Firestore;
+  }>;
 }
 
 async function getFirebaseApp() {
@@ -25,7 +42,7 @@ async function getFirebaseApp() {
   return firebaseApp;
 }
 
-export async function getFirebaseDb() {
+export async function getFirebaseDb(): Promise<Firestore> {
   if (firebaseDb) {
     return firebaseDb;
   }
