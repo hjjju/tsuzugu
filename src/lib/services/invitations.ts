@@ -5,6 +5,8 @@ type Firestore = unknown;
 
 export type CreateInvitationInput = Omit<Invitation, "slug"> & {
   slug?: string;
+  mainVisualText?: string; 
+  mapEmbedUrl?: string;
 };
 
 function normalizeSlug(baseSlug: string) {
@@ -38,6 +40,7 @@ function getDemoInvitation(): Invitation {
     slug: "demo",
     brideName: "結衣",
     groomName: "大輝",
+    mainVisualText: "Our Wedding Day",
     dateTimeISO: "2026-10-18T13:30:00+09:00",
     venueName: "表参道 Maison Garden",
     venueAddress: "東京都渋谷区神宮前 4-2-2",
@@ -114,6 +117,7 @@ export async function createInvitation(
   if (!isFirebaseConfigReady) {
     const slug = normalizeSlug(input.slug ?? "invite");
     return {
+      ...getDemoInvitation(), // Return a complete demo invitation
       ...input,
       slug,
     };
@@ -121,10 +125,13 @@ export async function createInvitation(
   const firebaseDb = (await getDb()) as Firestore;
   const { doc, setDoc } = await getFirestoreModule();
   const slug = await resolveUniqueSlug(input.slug ?? "invite");
+  
   const newInvitation: Invitation = {
-    ...input,
+    ...getDemoInvitation(), // Start with a complete demo invitation
+    ...input, // Overwrite with user input
     slug,
   };
+
   await setDoc(doc(firebaseDb, "invitations", slug), newInvitation);
   return newInvitation;
 }

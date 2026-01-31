@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { createInvitation } from "@/lib/services/invitations";
 
@@ -9,34 +9,61 @@ const defaultMessage =
 
 const templates = [
   {
-    key: "minimal",
-    label: "Minimal",
-    classes: {
-      card: "bg-white/80 border-black/5",
-      heading: "text-ink",
-      button: "bg-accent text-white",
-      spacing: "space-y-3",
-    },
+    key: "classic",
+    name: "Classic White",
+    description: "白とアイボリーの上質感",
+    preview: "/images/invite/sample/hero.jpg",
+    accent: "#C9A77C",
+    text: "#ffffff",
+    overlay: 35,
+    font: "serif",
+    letterY: 68,
+    animation: "fade",
   },
   {
-    key: "classic",
-    label: "Classic",
-    classes: {
-      card: "bg-white border-accent/30",
-      heading: "text-ink font-semibold",
-      button: "bg-ink text-white",
-      spacing: "space-y-4",
-    },
+    key: "nature",
+    name: "Nature Green",
+    description: "淡いグリーンと木漏れ日",
+    preview: "/images/invite/sample/gallery-01.jpg",
+    accent: "#7A9B7E",
+    text: "#ffffff",
+    overlay: 25,
+    font: "serif",
+    letterY: 64,
+    animation: "fade",
   },
   {
     key: "modern",
-    label: "Modern",
-    classes: {
-      card: "bg-ink text-white border-ink/20",
-      heading: "text-white",
-      button: "bg-white text-ink",
-      spacing: "space-y-5",
-    },
+    name: "Modern Dark",
+    description: "深みのある陰影とモダン",
+    preview: "/images/invite/sample/gallery-02.jpg",
+    accent: "#3A3A3A",
+    text: "#f7f4ef",
+    overlay: 55,
+    font: "sans",
+    letterY: 72,
+    animation: "envelope",
+  },
+];
+
+const bgmSamples = [
+  {
+    id: "bgm-01",
+    title: "Morning Light",
+    artist: "Studio Tsuzugu",
+    src: "/audio/bgm-01.mp3",
+  },
+  {
+    id: "bgm-02",
+    title: "Garden Walk",
+    artist: "Studio Tsuzugu",
+    src: "/audio/bgm-02.mp3",
+  },
+  {
+    id: "bgm-03",
+    title: "Warm Promise",
+    artist: "Studio Tsuzugu",
+    src: "/audio/bgm-03.mp3",
   },
 ];
 
@@ -58,31 +85,108 @@ function normalizeGallery(value: string) {
     .filter(Boolean);
 }
 
+const AdminTab = ({
+  children,
+  onClick,
+  active,
+}: {
+  children: React.ReactNode;
+  onClick: () => void;
+  active: boolean;
+}) => (
+  <button
+    type="button"
+    onClick={onClick}
+    className={`flex-1 h-12 text-sm font-medium border-b-2 transition-colors ${
+      active
+        ? "border-accent text-accent"
+        : "border-transparent text-ink/50 hover:text-ink/80"
+    }`}
+  >
+    {children}
+  </button>
+);
+
+const Accordion = ({
+  title,
+  children,
+  defaultOpen = false,
+}: {
+  title: string;
+  children: React.ReactNode;
+  defaultOpen?: boolean;
+}) => (
+  <details className="rounded-2xl border border-ink/10 bg-white/70" open={defaultOpen}>
+    <summary className="cursor-pointer list-none px-4 py-3 text-sm font-semibold text-ink">
+      {title}
+    </summary>
+    <div className="space-y-4 px-4 pb-4 text-sm text-ink/70">
+      {children}
+    </div>
+  </details>
+);
+
 export default function CreatePage() {
-  const [templateKey, setTemplateKey] = useState("minimal");
+  const [activeTab, setActiveTab] = useState("basic");
   const [brideName, setBrideName] = useState("陽菜");
   const [groomName, setGroomName] = useState("健人");
+  const [mainVisualText, setMainVisualText] = useState("Our Wedding Day");
   const [dateTimeISO, setDateTimeISO] = useState("2026-07-12T15:00");
   const [venueName, setVenueName] = useState("代官山 Hillside Chapel");
   const [venueAddress, setVenueAddress] = useState("東京都渋谷区猿楽町 23-3");
+  const [mapEmbedUrl, setMapEmbedUrl] = useState(
+    "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3241.693011382554!2d139.7024349152583!3d35.65991898019909!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x60188b5b5c9c9e6b%3A0x1b2d3b8b9b8d3b8d!2sHillside%20Terrace!5e0!3m2!1sen!2sjp!4v1628889781005!5m2!1sen!2sjp"
+  );
   const [heroImageUrl, setHeroImageUrl] = useState(
     "/images/invite/sample/hero.jpg"
   );
+  const [heroPreviewUrl, setHeroPreviewUrl] = useState<string | null>(null);
+  const [autoFocus, setAutoFocus] = useState(true);
+  const [focusX, setFocusX] = useState(50);
+  const [focusY, setFocusY] = useState(30);
+  const [letteringY, setLetteringY] = useState(70);
+  const [accentColor, setAccentColor] = useState("#C9A77C");
+  const [textColor, setTextColor] = useState("#ffffff");
+  const [overlayOpacity, setOverlayOpacity] = useState(40);
+  const [fontStyle, setFontStyle] = useState("serif");
+  const [selectedTemplate, setSelectedTemplate] = useState("classic");
+  const [selectedBgm, setSelectedBgm] = useState("bgm-01");
+  const [playingBgm, setPlayingBgm] = useState<string | null>(null);
+  const [animationType, setAnimationType] = useState("fade");
+  const [animationSpeed, setAnimationSpeed] = useState(600);
   const [galleryInput, setGalleryInput] = useState(
     "/images/invite/sample/gallery-01.jpg\n/images/invite/sample/gallery-02.jpg\n/images/invite/sample/gallery-03.jpg"
   );
   const [messageJP, setMessageJP] = useState(defaultMessage);
   const [paypayReceiveLink, setPaypayReceiveLink] = useState("");
+  const [paypayEnabled, setPaypayEnabled] = useState(true);
+  const [paypayBrideLink, setPaypayBrideLink] = useState("");
+  const [paypayGroomLink, setPaypayGroomLink] = useState("");
+  const [paypayNotice, setPaypayNotice] = useState(
+    "手数料0円で、感謝の気持ちをPayPayで直接お届けいただけます。"
+  );
+  const [paypayGuideText, setPaypayGuideText] = useState(
+    "1. ボタンを押してPayPayの受け取りリンクを開きます。\n2. 金額を入力し、内容をご確認ください。\n3. 送付後、必要に応じて完了画面を保存してください。"
+  );
   const [createdSlug, setCreatedSlug] = useState<string | null>(null);
   const [submitNotice, setSubmitNotice] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorNotice, setErrorNotice] = useState<string | null>(null);
+  const [isDirty, setIsDirty] = useState(false);
   const [baseUrl] = useState(() =>
     typeof window !== "undefined" ? window.location.origin : ""
   );
-
-  const selectedTemplate =
-    templates.find((template) => template.key === templateKey) || templates[0];
+  const [rsvpRequireName, setRsvpRequireName] = useState(true);
+  const [rsvpRequireFurigana, setRsvpRequireFurigana] = useState(true);
+  const [rsvpAllergyEnabled, setRsvpAllergyEnabled] = useState(true);
+  const [rsvpCompanionEnabled, setRsvpCompanionEnabled] = useState(true);
+  const [rsvpShuttleEnabled, setRsvpShuttleEnabled] = useState(false);
+  const [rsvpSpeechEnabled, setRsvpSpeechEnabled] = useState(false);
+  const [rsvpDeadline, setRsvpDeadline] = useState("2026-05-10");
+  const [rsvpNotice, setRsvpNotice] = useState(
+    "恐れ入りますが、期日までにご回答をお願い申し上げます。"
+  );
+  const audioRefs = useRef<Record<string, HTMLAudioElement | null>>({});
 
   const galleryImageUrls = useMemo(
     () => normalizeGallery(galleryInput),
@@ -101,6 +205,10 @@ export default function CreatePage() {
     }).format(date);
   }, [dateTimeISO]);
 
+  const previewImage = heroPreviewUrl || heroImageUrl;
+  const objectPosition = `${autoFocus ? 50 : focusX}% ${autoFocus ? 30 : focusY}%`;
+  const activeTemplate = templates.find((item) => item.key === selectedTemplate) || templates[0];
+
   async function handleCreate() {
     setIsSubmitting(true);
     setErrorNotice(null);
@@ -110,9 +218,11 @@ export default function CreatePage() {
         slug: slugBase,
         brideName,
         groomName,
+        mainVisualText,
         dateTimeISO: new Date(dateTimeISO).toISOString(),
         venueName,
         venueAddress,
+        mapEmbedUrl,
         heroImageUrl,
         galleryImageUrls,
         messageJP,
@@ -121,13 +231,26 @@ export default function CreatePage() {
           { time: "16:00", label: "挙式" },
           { time: "17:00", label: "披露宴" },
         ],
-        mapEmbedUrl: "",
-        paypayReceiveLink: paypayReceiveLink || undefined,
+        paypayReceiveLink: paypayEnabled ? effectivePaypayLink || undefined : undefined,
+        paypayEnabled,
+        paypayBrideLink: paypayBrideLink || undefined,
+        paypayGroomLink: paypayGroomLink || undefined,
+        paypayNotice,
+        paypayGuideText,
         lineShareText: `${brideName}と${groomName}の招待状です。ご確認ください。`,
+        rsvpRequireName,
+        rsvpRequireFurigana,
+        rsvpAllergyEnabled,
+        rsvpCompanionEnabled,
+        rsvpShuttleEnabled,
+        rsvpSpeechEnabled,
+        rsvpDeadline,
+        rsvpNotice,
       });
 
       setCreatedSlug(invitation.slug);
       setSubmitNotice("招待状を作成しました。リンクを共有してください。");
+      setIsDirty(false);
     } catch (error) {
       console.error(error);
       setErrorNotice("招待状の作成に失敗しました。");
@@ -136,164 +259,881 @@ export default function CreatePage() {
     }
   }
 
+  function handlePreviewBgm(id: string) {
+    const audio = audioRefs.current[id];
+    if (!audio) return;
+    if (playingBgm === id) {
+      audio.pause();
+      audio.currentTime = 0;
+      setPlayingBgm(null);
+      return;
+    }
+    if (playingBgm && audioRefs.current[playingBgm]) {
+      audioRefs.current[playingBgm]?.pause();
+      if (audioRefs.current[playingBgm]) {
+        audioRefs.current[playingBgm]!.currentTime = 0;
+      }
+    }
+    audio.play();
+    setPlayingBgm(id);
+  }
+
   const inviteUrl = createdSlug
     ? `${baseUrl}/invite/${createdSlug}`
     : undefined;
+  const effectivePaypayLink =
+    paypayBrideLink || paypayGroomLink || paypayReceiveLink;
+  const paypaySteps = paypayGuideText
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean);
 
   return (
-    <div className="mx-auto w-full max-w-md px-4 pb-12 pt-8">
-      <section className="fade-in space-y-2">
-        <p className="text-xs uppercase tracking-[0.3em] text-ink/50">Create</p>
-        <h1 className="text-2xl font-semibold text-ink">招待状を作る</h1>
-        <p className="text-sm text-ink/70">
-          入力内容はそのままプレビューへ反映されます。
+    <div className="mx-auto w-full max-w-5xl px-4 pb-24 pt-8">
+      <header className="fade-in space-y-2">
+        <p className="text-xs uppercase tracking-[0.3em] text-ink/50">
+          Tsuzugu Admin
         </p>
-      </section>
+        <h1 className="text-2xl font-semibold text-ink">招待状を作る</h1>
+        <p className="text-sm text-ink/60">
+          丁寧な言葉選びと余白を意識しながら、上質な招待状をお仕立てします。
+        </p>
+      </header>
 
-      <section className="fade-in mt-6 space-y-4 rounded-3xl border border-black/5 bg-white/70 p-5">
-        <div className="flex gap-2">
-          {templates.map((template) => (
-            <button
-              key={template.key}
-              type="button"
-              onClick={() => setTemplateKey(template.key)}
-              className={`h-9 flex-1 rounded-full border text-xs ${
-                templateKey === template.key
-                  ? "border-accent bg-accent/20"
-                  : "border-ink/20 text-ink/60"
-              }`}
+      <main className="fade-in mt-6 grid gap-6 md:grid-cols-[1.15fr_0.85fr]">
+        <section className="tsz-card">
+          <div className="flex rounded-t-3xl border-b border-black/10 bg-white/90">
+            <AdminTab
+              onClick={() => setActiveTab("basic")}
+              active={activeTab === "basic"}
             >
-              {template.label}
-            </button>
-          ))}
-        </div>
-        <div className="grid gap-3">
-          <div className="grid grid-cols-2 gap-3">
-            <input
-              className="h-11 rounded-2xl border border-ink/15 bg-white/80 px-3 text-sm"
-              value={brideName}
-              onChange={(event) => setBrideName(event.target.value)}
-              placeholder="新婦のお名前"
-            />
-            <input
-              className="h-11 rounded-2xl border border-ink/15 bg-white/80 px-3 text-sm"
-              value={groomName}
-              onChange={(event) => setGroomName(event.target.value)}
-              placeholder="新郎のお名前"
-            />
+              基本情報
+            </AdminTab>
+            <AdminTab
+              onClick={() => setActiveTab("design")}
+              active={activeTab === "design"}
+            >
+              デザイン
+            </AdminTab>
+            <AdminTab
+              onClick={() => setActiveTab("rsvp")}
+              active={activeTab === "rsvp"}
+            >
+              RSVP設定
+            </AdminTab>
+            <AdminTab
+              onClick={() => setActiveTab("payment")}
+              active={activeTab === "payment"}
+            >
+              結済・送金
+            </AdminTab>
           </div>
-          <input
-            type="datetime-local"
-            className="h-11 rounded-2xl border border-ink/15 bg-white/80 px-3 text-sm"
-            value={dateTimeISO}
-            onChange={(event) => setDateTimeISO(event.target.value)}
-          />
-          <input
-            className="h-11 rounded-2xl border border-ink/15 bg-white/80 px-3 text-sm"
-            value={venueName}
-            onChange={(event) => setVenueName(event.target.value)}
-            placeholder="会場名"
-          />
-          <input
-            className="h-11 rounded-2xl border border-ink/15 bg-white/80 px-3 text-sm"
-            value={venueAddress}
-            onChange={(event) => setVenueAddress(event.target.value)}
-            placeholder="会場住所"
-          />
-          <input
-            className="h-11 rounded-2xl border border-ink/15 bg-white/80 px-3 text-sm"
-            value={heroImageUrl}
-            onChange={(event) => setHeroImageUrl(event.target.value)}
-            placeholder="メイン画像URL"
-          />
-          <textarea
-            className="min-h-[88px] rounded-2xl border border-ink/15 bg-white/80 px-3 py-2 text-sm"
-            value={galleryInput}
-            onChange={(event) => setGalleryInput(event.target.value)}
-            placeholder="ギャラリー画像URL (改行区切り)"
-          />
-          <textarea
-            className="min-h-[120px] rounded-2xl border border-ink/15 bg-white/80 px-3 py-2 text-sm"
-            value={messageJP}
-            onChange={(event) => setMessageJP(event.target.value)}
-            placeholder="招待文"
-          />
-          <input
-            className="h-11 rounded-2xl border border-ink/15 bg-white/80 px-3 text-sm"
-            value={paypayReceiveLink}
-            onChange={(event) => setPaypayReceiveLink(event.target.value)}
-            placeholder="PayPay受け取りリンク (任意)"
-          />
-        </div>
+
+          <div className="space-y-6 p-6">
+            {activeTab === "basic" && (
+              <div className="space-y-5">
+                <h2 className="text-sm font-semibold text-ink">基本情報</h2>
+                <div className="grid grid-cols-2 gap-3">
+                  <input
+                    className="h-11 rounded-xl border border-ink/15 bg-white/80 px-3 text-sm"
+                    value={brideName}
+                    onChange={(e) => {
+                      setBrideName(e.target.value);
+                      setIsDirty(true);
+                    }}
+                    placeholder="新婦のお名前"
+                  />
+                  <input
+                    className="h-11 rounded-xl border border-ink/15 bg-white/80 px-3 text-sm"
+                    value={groomName}
+                    onChange={(e) => {
+                      setGroomName(e.target.value);
+                      setIsDirty(true);
+                    }}
+                    placeholder="新郎のお名前"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm text-ink">日時</label>
+                  <input
+                    type="datetime-local"
+                    className="w-full h-11 rounded-xl border border-ink/15 bg-white/80 px-3 text-sm"
+                    value={dateTimeISO}
+                    onChange={(e) => {
+                      setDateTimeISO(e.target.value);
+                      setIsDirty(true);
+                    }}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm text-ink">会場名</label>
+                  <input
+                    className="w-full h-11 rounded-xl border border-ink/15 bg-white/80 px-3 text-sm"
+                    value={venueName}
+                    onChange={(e) => {
+                      setVenueName(e.target.value);
+                      setIsDirty(true);
+                    }}
+                    placeholder="会場名"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm text-ink">会場住所</label>
+                  <input
+                    className="w-full h-11 rounded-xl border border-ink/15 bg-white/80 px-3 text-sm"
+                    value={venueAddress}
+                    onChange={(e) => {
+                      setVenueAddress(e.target.value);
+                      setIsDirty(true);
+                    }}
+                    placeholder="会場住所"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm text-ink">地図URL</label>
+                  <input
+                    className="w-full h-11 rounded-xl border border-ink/15 bg-white/80 px-3 text-sm"
+                    value={mapEmbedUrl}
+                    onChange={(e) => {
+                      setMapEmbedUrl(e.target.value);
+                      setIsDirty(true);
+                    }}
+                    placeholder="Googleマップ埋め込みURL"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <div className="flex items-start gap-2">
+                    <span className="text-sm text-ink">ご挨拶文</span>
+                    <span
+                      className="ml-1 inline-flex h-5 w-5 items-center justify-center rounded-full border border-ink/20 text-[10px] text-ink/60"
+                      title="忌み言葉を避け、感謝とこれからのご縁を丁寧にお伝えください。"
+                      aria-label="忌み言葉を避け、感謝とこれからのご縁を丁寧にお伝えください。"
+                    >
+                      ?
+                    </span>
+                  </div>
+                  <textarea
+                    className="w-full min-h-[140px] rounded-xl border border-ink/15 bg-white/80 px-3 py-2 text-sm"
+                    value={messageJP}
+                    onChange={(e) => {
+                      setMessageJP(e.target.value);
+                      setIsDirty(true);
+                    }}
+                    placeholder="招待文"
+                  />
+                </div>
+              </div>
+            )}
+
+            {activeTab === "design" && (
+              <div className="space-y-5">
+                <p className="text-sm text-ink/60">
+                  日本結婚式では柔らかなベージュとホワイトが信頼感を伝えます。
+                </p>
+
+                <Accordion title="テンプレート選択" defaultOpen>
+                  <div className="flex items-center gap-2 text-xs text-ink/50">
+                    <span className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-ink/20 text-[10px]">
+                      i
+                    </span>
+                    <p>
+                      雰囲気に近いテンプレートを選ぶと、配色と演出が自動で整います。
+                    </p>
+                  </div>
+                  <div className="grid gap-3 md:grid-cols-2">
+                    {templates.map((item) => (
+                      <button
+                        key={item.key}
+                        type="button"
+                        onClick={() => {
+                          setSelectedTemplate(item.key);
+                          setAccentColor(item.accent);
+                          setTextColor(item.text);
+                          setOverlayOpacity(item.overlay);
+                          setHeroImageUrl(item.preview);
+                          setFontStyle(item.font);
+                          setLetteringY(item.letterY);
+                          setAnimationType(item.animation);
+                          setIsDirty(true);
+                        }}
+                        className={`rounded-2xl border p-3 text-left transition-shadow ${
+                          selectedTemplate === item.key
+                            ? "border-accent shadow-sm"
+                            : "border-ink/10"
+                        }`}
+                      >
+                        <div
+                          className="h-20 w-full rounded-xl bg-ink/5"
+                          style={{
+                            backgroundImage: `url(${item.preview})`,
+                            backgroundSize: "cover",
+                            backgroundPosition: "center",
+                          }}
+                        />
+                        <p className="mt-3 text-sm font-semibold text-ink">
+                          {item.name}
+                        </p>
+                        <p className="text-xs text-ink/60">{item.description}</p>
+                      </button>
+                    ))}
+                  </div>
+                </Accordion>
+
+                <Accordion title="メインビジュアル" defaultOpen>
+                  <div className="flex items-center gap-2 text-xs text-ink/50">
+                    <span className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-ink/20 text-[10px]">
+                      i
+                    </span>
+                    <p>
+                      レタリングは写真の明るい部分を避けると読みやすくなります。
+                    </p>
+                  </div>
+                  <div className="space-y-3">
+                    <label className="text-sm text-ink">画像アップロード</label>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="text-sm"
+                      onChange={(event) => {
+                        const file = event.target.files?.[0];
+                        if (file) {
+                          const url = URL.createObjectURL(file);
+                          setHeroPreviewUrl(url);
+                          setIsDirty(true);
+                        }
+                      }}
+                    />
+                    <label className="text-sm text-ink">画像URL</label>
+                    <input
+                      className="w-full h-11 rounded-xl border border-ink/15 bg-white/80 px-3 text-sm"
+                      value={heroImageUrl}
+                      onChange={(e) => {
+                        setHeroImageUrl(e.target.value);
+                        setHeroPreviewUrl(null);
+                        setIsDirty(true);
+                      }}
+                    />
+                    <label className="text-sm text-ink">レタリング文言</label>
+                    <input
+                      className="w-full h-11 rounded-xl border border-ink/15 bg-white/80 px-3 text-sm"
+                      value={mainVisualText}
+                      onChange={(e) => {
+                        setMainVisualText(e.target.value);
+                        setIsDirty(true);
+                      }}
+                    />
+                    <div className="space-y-2">
+                      <label className="text-xs text-ink/60">レタリング位置</label>
+                      <input
+                        type="range"
+                        min={10}
+                        max={90}
+                        value={letteringY}
+                        onChange={(event) => {
+                          setLetteringY(Number(event.target.value));
+                          setIsDirty(true);
+                        }}
+                        className="w-full"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-xs text-ink/60">テキストカラー</label>
+                      <input
+                        type="color"
+                        value={textColor}
+                        onChange={(event) => {
+                          setTextColor(event.target.value);
+                          setIsDirty(true);
+                        }}
+                        className="h-11 w-full rounded-xl border border-ink/15 bg-white/80 p-2"
+                      />
+                    </div>
+                    <div className="space-y-2 rounded-xl border border-ink/10 bg-white/70 p-3">
+                      <label className="flex items-center justify-between text-xs text-ink/60">
+                        <span>自動フォーカス</span>
+                        <input
+                          type="checkbox"
+                          checked={autoFocus}
+                          onChange={(event) => {
+                            setAutoFocus(event.target.checked);
+                            if (event.target.checked) {
+                              setFocusX(50);
+                              setFocusY(30);
+                            }
+                            setIsDirty(true);
+                          }}
+                        />
+                      </label>
+                      <div className="space-y-2">
+                        <label className="text-[11px] text-ink/50">フォーカス位置（左右）</label>
+                        <input
+                          type="range"
+                          min={0}
+                          max={100}
+                          value={focusX}
+                          onChange={(event) => {
+                            setFocusX(Number(event.target.value));
+                            setIsDirty(true);
+                          }}
+                          className="w-full"
+                          disabled={autoFocus}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-[11px] text-ink/50">フォーカス位置（上下）</label>
+                        <input
+                          type="range"
+                          min={0}
+                          max={100}
+                          value={focusY}
+                          onChange={(event) => {
+                            setFocusY(Number(event.target.value));
+                            setIsDirty(true);
+                          }}
+                          className="w-full"
+                          disabled={autoFocus}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </Accordion>
+
+                <Accordion title="フォント・カラー">
+                  <div className="flex items-center gap-2 text-xs text-ink/50">
+                    <span className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-ink/20 text-[10px]">
+                      i
+                    </span>
+                    <p>明朝体は格調高く、ゴシック体は読みやすく整います。</p>
+                  </div>
+                  <div className="grid gap-3">
+                    <label className="text-sm text-ink">フォント設定</label>
+                    <select
+                      className="h-11 rounded-xl border border-ink/15 bg-white/80 px-3 text-sm"
+                      value={fontStyle}
+                      onChange={(e) => {
+                        setFontStyle(e.target.value);
+                        setIsDirty(true);
+                      }}
+                    >
+                      <option value="serif">明朝体（上品）</option>
+                      <option value="sans">ゴシック体（読みやすい）</option>
+                    </select>
+                    <label className="text-sm text-ink">アクセントカラー</label>
+                    <input
+                      type="color"
+                      value={accentColor}
+                      onChange={(event) => {
+                        setAccentColor(event.target.value);
+                        setIsDirty(true);
+                      }}
+                      className="h-11 w-full rounded-xl border border-ink/15 bg-white/80 p-2"
+                    />
+                    <label className="text-sm text-ink">オーバーレイ濃度</label>
+                    <input
+                      type="range"
+                      min={0}
+                      max={70}
+                      value={overlayOpacity}
+                      onChange={(event) => {
+                        setOverlayOpacity(Number(event.target.value));
+                        setIsDirty(true);
+                      }}
+                      className="w-full"
+                    />
+                  </div>
+                </Accordion>
+
+                <Accordion title="自動フォーカス">
+                  <div className="space-y-3">
+                    <label className="flex items-center justify-between text-sm text-ink">
+                      <span>自動フォーカス</span>
+                      <input
+                        type="checkbox"
+                        checked={autoFocus}
+                        onChange={(event) => {
+                          setAutoFocus(event.target.checked);
+                          if (event.target.checked) {
+                            setFocusX(50);
+                            setFocusY(30);
+                          }
+                          setIsDirty(true);
+                        }}
+                      />
+                    </label>
+                    <div className="space-y-2">
+                      <label className="text-xs text-ink/60">フォーカス位置（左右）</label>
+                      <input
+                        type="range"
+                        min={0}
+                        max={100}
+                        value={focusX}
+                        onChange={(event) => {
+                          setFocusX(Number(event.target.value));
+                          setIsDirty(true);
+                        }}
+                        className="w-full"
+                        disabled={autoFocus}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-xs text-ink/60">フォーカス位置（上下）</label>
+                      <input
+                        type="range"
+                        min={0}
+                        max={100}
+                        value={focusY}
+                        onChange={(event) => {
+                          setFocusY(Number(event.target.value));
+                          setIsDirty(true);
+                        }}
+                        className="w-full"
+                        disabled={autoFocus}
+                      />
+                    </div>
+                  </div>
+                </Accordion>
+
+                <Accordion title="BGM">
+                  <div className="flex items-center gap-2 text-xs text-ink/50">
+                    <span className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-ink/20 text-[10px]">
+                      i
+                    </span>
+                    <p>受け取った方の環境に配慮し、控えめな音量を推奨します。</p>
+                  </div>
+                  <div className="space-y-3">
+                    <label className="text-sm text-ink">サンプルBGM</label>
+                    <div className="space-y-2">
+                      {bgmSamples.map((bgm) => (
+                        <div
+                          key={bgm.id}
+                          className={`flex items-center justify-between rounded-xl border px-3 py-2 text-sm ${
+                            selectedBgm === bgm.id
+                              ? "border-accent bg-accent/10"
+                              : "border-ink/10"
+                          }`}
+                        >
+                          <div>
+                            <p className="text-ink">{bgm.title}</p>
+                            <p className="text-xs text-ink/50">{bgm.artist}</p>
+                          </div>
+                          <div className="flex gap-2">
+                            <button
+                              type="button"
+                              className="rounded-full border border-ink/15 px-3 py-1 text-xs"
+                              onClick={() => handlePreviewBgm(bgm.id)}
+                            >
+                              {playingBgm === bgm.id ? "停止" : "試聴"}
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setSelectedBgm(bgm.id);
+                                setIsDirty(true);
+                              }}
+                              className="rounded-full border border-ink/15 px-3 py-1 text-xs"
+                            >
+                              選択
+                            </button>
+                          </div>
+                          <audio
+                            ref={(element) => {
+                              audioRefs.current[bgm.id] = element;
+                            }}
+                            src={bgm.src}
+                            preload="none"
+                            onEnded={() => setPlayingBgm(null)}
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </Accordion>
+
+                <Accordion title="アニメーション">
+                  <div className="flex items-center gap-2 text-xs text-ink/50">
+                    <span className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-ink/20 text-[10px]">
+                      i
+                    </span>
+                    <p>余白のある演出ほど上品に見える傾向があります。</p>
+                  </div>
+                  <div className="space-y-3">
+                    <label className="text-sm text-ink">演出</label>
+                    <select
+                      className="h-11 rounded-xl border border-ink/15 bg-white/80 px-3 text-sm"
+                      value={animationType}
+                      onChange={(e) => {
+                        setAnimationType(e.target.value);
+                        setIsDirty(true);
+                      }}
+                    >
+                      <option value="fade">テキストフェード</option>
+                      <option value="envelope">封筒が開く演出</option>
+                    </select>
+                    <label className="text-sm text-ink">フェード速度</label>
+                    <input
+                      type="range"
+                      min={200}
+                      max={1200}
+                      value={animationSpeed}
+                      onChange={(e) => {
+                        setAnimationSpeed(Number(e.target.value));
+                        setIsDirty(true);
+                      }}
+                      className="w-full"
+                    />
+                  </div>
+                </Accordion>
+              </div>
+            )}
+
+            {activeTab === "rsvp" && (
+              <div className="space-y-4">
+                <h2 className="text-sm font-semibold text-ink">RSVP設定</h2>
+                <p className="text-sm text-ink/70">
+                  招待状に表示される出欠フォームの項目を設定します。
+                </p>
+                <div className="space-y-3 rounded-2xl bg-white/60 p-4">
+                  <label className="flex items-center justify-between text-sm">
+                    <span>お名前（姓・名）を必須にする</span>
+                    <input
+                      type="checkbox"
+                      checked={rsvpRequireName}
+                      onChange={(event) => {
+                        setRsvpRequireName(event.target.checked);
+                        setIsDirty(true);
+                      }}
+                    />
+                  </label>
+                  <label className="flex items-center justify-between text-sm">
+                    <span>フリガナ（セイ・メイ）を必須にする</span>
+                    <input
+                      type="checkbox"
+                      checked={rsvpRequireFurigana}
+                      onChange={(event) => {
+                        setRsvpRequireFurigana(event.target.checked);
+                        setIsDirty(true);
+                      }}
+                    />
+                  </label>
+                  <label className="flex items-center justify-between text-sm">
+                    <span>食物アレルギーの確認を表示</span>
+                    <input
+                      type="checkbox"
+                      checked={rsvpAllergyEnabled}
+                      onChange={(event) => {
+                        setRsvpAllergyEnabled(event.target.checked);
+                        setIsDirty(true);
+                      }}
+                    />
+                  </label>
+                  <label className="flex items-center justify-between text-sm">
+                    <span>同伴者氏名の記入欄を表示</span>
+                    <input
+                      type="checkbox"
+                      checked={rsvpCompanionEnabled}
+                      onChange={(event) => {
+                        setRsvpCompanionEnabled(event.target.checked);
+                        setIsDirty(true);
+                      }}
+                    />
+                  </label>
+                  <label className="flex items-center justify-between text-sm">
+                    <span>送迎バスご利用の確認</span>
+                    <input
+                      type="checkbox"
+                      checked={rsvpShuttleEnabled}
+                      onChange={(event) => {
+                        setRsvpShuttleEnabled(event.target.checked);
+                        setIsDirty(true);
+                      }}
+                    />
+                  </label>
+                  <label className="flex items-center justify-between text-sm">
+                    <span>祝辞ご担当の確認</span>
+                    <input
+                      type="checkbox"
+                      checked={rsvpSpeechEnabled}
+                      onChange={(event) => {
+                        setRsvpSpeechEnabled(event.target.checked);
+                        setIsDirty(true);
+                      }}
+                    />
+                  </label>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm text-ink">回答期限</label>
+                  <input
+                    type="date"
+                    className="h-11 w-full rounded-xl border border-ink/15 bg-white/80 px-3 text-sm"
+                    value={rsvpDeadline}
+                    onChange={(event) => {
+                      setRsvpDeadline(event.target.value);
+                      setIsDirty(true);
+                    }}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm text-ink">ご案内文</label>
+                  <textarea
+                    className="min-h-[100px] w-full rounded-xl border border-ink/15 bg-white/80 px-3 py-2 text-sm"
+                    value={rsvpNotice}
+                    onChange={(event) => {
+                      setRsvpNotice(event.target.value);
+                      setIsDirty(true);
+                    }}
+                  />
+                </div>
+                <div className="text-xs text-ink/60">
+                  日本の式では柔らかなベージュとホワイトが信頼感を与えます。
+                </div>
+              </div>
+            )}
+
+            {activeTab === "payment" && (
+              <div className="space-y-4">
+                <h2 className="text-sm font-semibold text-ink">結済・送金設定</h2>
+                <p className="text-sm text-ink/70">
+                  PayPayの受け取りリンクを設定すると、招待状に送金ボタンが表示されます。
+                </p>
+                <div className="rounded-2xl bg-white/70 p-4 space-y-3">
+                  <label className="flex items-center justify-between text-sm">
+                    <span>事前ご祝儀のご案内を表示</span>
+                    <input
+                      type="checkbox"
+                      checked={paypayEnabled}
+                      onChange={(event) => {
+                        setPaypayEnabled(event.target.checked);
+                        setIsDirty(true);
+                      }}
+                    />
+                  </label>
+                  <div className="space-y-2">
+                    <label className="text-sm text-ink">新婦様 PayPay受け取りリンク</label>
+                    <input
+                      className="w-full h-11 rounded-xl border border-ink/15 bg-white/80 px-3 text-sm"
+                      value={paypayBrideLink}
+                      onChange={(e) => {
+                        setPaypayBrideLink(e.target.value);
+                        setIsDirty(true);
+                      }}
+                      placeholder="https://pay.paypay.ne.jp/..."
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm text-ink">新郎様 PayPay受け取りリンク</label>
+                    <input
+                      className="w-full h-11 rounded-xl border border-ink/15 bg-white/80 px-3 text-sm"
+                      value={paypayGroomLink}
+                      onChange={(e) => {
+                        setPaypayGroomLink(e.target.value);
+                        setIsDirty(true);
+                      }}
+                      placeholder="https://pay.paypay.ne.jp/..."
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm text-ink">手数料0円のご案内文</label>
+                  <textarea
+                    className="min-h-[90px] w-full rounded-xl border border-ink/15 bg-white/80 px-3 py-2 text-sm"
+                    value={paypayNotice}
+                    onChange={(event) => {
+                      setPaypayNotice(event.target.value);
+                      setIsDirty(true);
+                    }}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm text-ink">
+                    PayPay送金方法ガイド（改行区切り）
+                  </label>
+                  <textarea
+                    className="min-h-[120px] w-full rounded-xl border border-ink/15 bg-white/80 px-3 py-2 text-sm"
+                    value={paypayGuideText}
+                    onChange={(event) => {
+                      setPaypayGuideText(event.target.value);
+                      setIsDirty(true);
+                    }}
+                  />
+                </div>
+                <div className="text-xs text-ink/60">
+                  ご祝儀は任意である旨を添え、当日のお持ち込みも可能であることを丁寧に記載します。
+                </div>
+              </div>
+            )}
+          </div>
+        </section>
+
+        <aside className="tsz-card p-5 md:sticky md:top-24">
+          <h2 className="text-sm font-semibold text-ink">モバイルプレビュー</h2>
+          <div className="mt-4 flex justify-center">
+            <div className="relative w-[260px] rounded-[36px] border border-black/10 bg-black/5 p-3 shadow-sm">
+              <div className="overflow-hidden rounded-[28px] bg-white">
+                <div className="relative h-64">
+                  <div
+                    className="absolute inset-0 bg-black"
+                    style={{ opacity: overlayOpacity / 100 }}
+                  />
+                  <img
+                    src={previewImage}
+                    alt="招待状メインビジュアル"
+                    className="h-full w-full object-cover"
+                    style={{ objectPosition }}
+                  />
+                  <div
+                    className={`absolute inset-x-6 text-center ${
+                      animationType === "fade" ? "fade-in" : "" 
+                    }`}
+                    style={{
+                      top: `${letteringY}%`,
+                      transform: "translateY(-50%)",
+                      animationDuration: `${animationSpeed}ms`,
+                    }}
+                  >
+                    <p
+                      className="text-xs uppercase tracking-[0.3em]"
+                      style={{ color: textColor }}
+                    >
+                      {mainVisualText}
+                    </p>
+                    <h3
+                      className={`mt-2 text-2xl font-semibold ${
+                        fontStyle === "serif" ? "font-display" : "font-sans"
+                      }`}
+                      style={{ color: textColor }}
+                    >
+                      {brideName} & {groomName}
+                    </h3>
+                  </div>
+                  {animationType === "envelope" ? (
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="h-20 w-28 origin-bottom animate-[fade-in_0.6s_ease_both] rounded-t-2xl border border-white/60 bg-white/80" />
+                    </div>
+                  ) : null}
+                </div>
+                <div className="space-y-3 p-5">
+                  <p className="text-sm text-ink">{previewDate}</p>
+                  <p className="text-sm text-ink/70">{venueName}</p>
+                  <div className="h-px bg-black/5" />
+                  <p className="text-xs text-ink/60 whitespace-pre-line">
+                    {messageJP}
+                  </p>
+                  <button
+                    type="button"
+                    className="mt-2 w-full rounded-full py-2 text-xs font-semibold"
+                    style={{ backgroundColor: accentColor, color: "#fff" }}
+                  >
+                    ご出欠の回答へ
+                  </button>
+                  <div className="space-y-2 pt-3">
+                    <p className="text-[11px] text-ink/60">{rsvpNotice}</p>
+                    <p className="text-[11px] text-ink/50">
+                      ご回答期限: {rsvpDeadline}
+                    </p>
+                    <div className="grid gap-2">
+                      {rsvpRequireName ? (
+                        <div className="h-8 rounded-lg border border-ink/10 bg-white/60 text-[10px] text-ink/50 px-2 py-1">
+                          お名前（姓・名）
+                        </div>
+                      ) : null}
+                      {rsvpRequireFurigana ? (
+                        <div className="h-8 rounded-lg border border-ink/10 bg-white/60 text-[10px] text-ink/50 px-2 py-1">
+                          フリガナ（セイ・メイ）
+                        </div>
+                      ) : null}
+                      {rsvpAllergyEnabled ? (
+                        <div className="h-10 rounded-lg border border-ink/10 bg-white/60 text-[10px] text-ink/50 px-2 py-1">
+                          食物アレルギーの有無・内容
+                        </div>
+                      ) : null}
+                      {rsvpCompanionEnabled ? (
+                        <div className="h-8 rounded-lg border border-ink/10 bg-white/60 text-[10px] text-ink/50 px-2 py-1">
+                          同伴者氏名（任意）
+                        </div>
+                      ) : null}
+                      {rsvpShuttleEnabled ? (
+                        <div className="h-8 rounded-lg border border-ink/10 bg-white/60 text-[10px] text-ink/50 px-2 py-1">
+                          送迎バスのご利用有無
+                        </div>
+                      ) : null}
+                      {rsvpSpeechEnabled ? (
+                        <div className="h-8 rounded-lg border border-ink/10 bg-white/60 text-[10px] text-ink/50 px-2 py-1">
+                          祝辞ご担当の確認
+                        </div>
+                      ) : null}
+                    </div>
+                  </div>
+                </div>
+                {paypayEnabled ? (
+                  <div className="border-t border-black/5 bg-white/90 px-4 py-3">
+                    <p className="text-[10px] text-ink/60">{paypayNotice}</p>
+                    <button
+                      type="button"
+                      className="mt-2 flex h-9 w-full items-center justify-center gap-2 rounded-full text-[10px] font-semibold text-white"
+                      style={{ backgroundColor: "#ff0033" }}
+                    >
+                      <span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-white text-[8px] font-bold text-[#ff0033]">
+                        Pay
+                      </span>
+                      PayPayで送る
+                    </button>
+                    {paypaySteps.length ? (
+                      <div className="mt-2 space-y-1 rounded-lg border border-ink/10 bg-white/70 p-2 text-[9px] text-ink/60">
+                        <p className="font-semibold text-ink/70">
+                          PayPay送金方法ガイド
+                        </p>
+                        {paypaySteps.map((step, index) => (
+                          <p key={step}>{index + 1}. {step}</p>
+                        ))}
+                      </div>
+                    ) : null}
+                  </div>
+                ) : null}
+              </div>
+              <div className="absolute left-1/2 top-1 -translate-x-1/2 rounded-full bg-black/30 px-4 py-1 text-[10px] text-white/80">
+                iPhone Preview
+              </div>
+            </div>
+          </div>
+        </aside>
+      </main>
+
+      <div className="mt-8">
         <button
           type="button"
           onClick={handleCreate}
-          className="flex h-11 items-center justify-center rounded-full bg-accent text-sm font-semibold text-white transition-opacity duration-300 hover:opacity-80 disabled:opacity-40"
+          className="tsz-button-primary w-full h-12 disabled:opacity-40"
           disabled={isSubmitting}
         >
-          {isSubmitting ? "作成中..." : "招待状を作成"}
+          {isSubmitting ? "作成中..." : "招待状を作成する"}
         </button>
-        {errorNotice ? (
-          <p className="text-sm text-ink/60">{errorNotice}</p>
-        ) : null}
-        {submitNotice ? (
-          <div className="rounded-2xl border border-accent/30 bg-accent/10 p-4 text-sm text-ink">
-            <p className="font-semibold">{submitNotice}</p>
-            {inviteUrl ? (
-              <div className="mt-2 flex items-center justify-between">
-                <span className="text-xs text-ink/60">{inviteUrl}</span>
-                <Link
-                  href={`/invite/${createdSlug}`}
-                  className="rounded-full border border-ink/20 px-3 py-1 text-xs text-ink"
-                >
-                  開く
-                </Link>
-              </div>
-            ) : null}
-          </div>
-        ) : null}
-      </section>
+      </div>
 
-      <section className="fade-in mt-6">
-        <h2 className="text-lg font-semibold text-ink">プレビュー</h2>
-        <div
-          className={`mt-3 rounded-3xl border p-5 ${selectedTemplate.classes.card}`}
-        >
-          <div className={selectedTemplate.classes.spacing}>
-            <div
-              className="h-40 rounded-2xl bg-ink/10"
-              style={{
-                backgroundImage: `url(${heroImageUrl})`,
-                backgroundSize: "cover",
-                backgroundPosition: "center",
-              }}
-            />
-            <div>
-              <p className="text-xs uppercase tracking-[0.3em] opacity-70">
-                Wedding Invitation
-              </p>
-              <h3
-                className={`text-xl font-semibold ${selectedTemplate.classes.heading}`}
-              >
-                {brideName} & {groomName}
-              </h3>
-              <p className="text-sm opacity-70">{previewDate}</p>
-              <p className="text-sm opacity-70">{venueName}</p>
-            </div>
-            <p className="text-sm leading-relaxed opacity-80 whitespace-pre-line">
-              {messageJP}
-            </p>
-            <button
-              type="button"
-              className={`h-11 w-full rounded-full text-sm font-semibold ${
-                selectedTemplate.classes.button
-              }`}
+      {errorNotice && (
+        <p className="mt-4 text-center text-sm text-red-500">{errorNotice}</p>
+      )}
+
+      {submitNotice && inviteUrl && (
+        <div className="mt-6 rounded-2xl border border-accent/30 bg-accent/10 p-4 text-sm text-ink">
+          <p className="font-semibold text-center">{submitNotice}</p>
+          <div className="mt-3 flex items-center justify-between rounded-full bg-white/80 p-2">
+            <span className="pl-3 text-xs text-ink/60 truncate">{inviteUrl}</span>
+            <Link
+              href={inviteUrl}
+              target="_blank"
+              className="rounded-full bg-white shadow-sm border border-ink/10 px-4 py-2 text-xs font-semibold text-ink"
             >
-              出欠を回答
-            </button>
+              プレビュー
+            </Link>
           </div>
         </div>
-      </section>
+      )}
+
+      {isDirty ? (
+        <div className="fixed bottom-4 left-1/2 z-30 w-[92%] -translate-x-1/2 rounded-full bg-ink px-4 py-3 text-center text-xs font-medium text-white shadow-lg">
+          保存されていない変更があります
+        </div>
+      ) : null}
     </div>
   );
 }

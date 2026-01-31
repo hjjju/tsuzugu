@@ -45,7 +45,7 @@ export default function Home() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-md px-4 pb-12 pt-10">
+    <div className="tsz-page pb-12 pt-10">
       <section className="fade-in relative overflow-hidden rounded-[36px] border border-black/5 bg-[radial-gradient(circle_at_top,_#f6efe6,_#f9f8f6_55%)] p-7 shadow-sm">
         <div className="space-y-6 text-center">
           <p className="text-xs uppercase tracking-[0.5em] text-ink/50">
@@ -58,15 +58,12 @@ export default function Home() {
             日本の礼儀と、韓国の感性をかけ合わせたウェディング招待状サービス
           </p>
           <div className="flex flex-col gap-3">
-            <Link
-              href="/create"
-              className="flex h-11 items-center justify-center rounded-full bg-accent px-5 text-sm font-semibold text-white transition-opacity duration-300 hover:opacity-80"
-            >
+            <Link href="/create" className="tsz-button-primary">
               無料で招待状を作成
             </Link>
             <Link
               href="/invite/demo"
-              className="flex h-11 items-center justify-center rounded-full border border-ink/20 bg-white/70 px-5 text-sm font-medium text-ink transition-opacity duration-300 hover:opacity-80"
+              className="tsz-button-secondary"
             >
               サンプルを見る
             </Link>
@@ -74,7 +71,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="fade-in mt-10 space-y-5">
+      <section className="fade-in tsz-section space-y-5">
         <div className="text-center">
           <h2 className="text-lg font-semibold text-ink">特長</h2>
           <p className="mt-2 text-sm text-ink/60">
@@ -83,10 +80,7 @@ export default function Home() {
         </div>
         <div className="grid gap-4 sm:grid-cols-3">
           {features.map((item) => (
-            <div
-              key={item.title}
-              className="rounded-3xl border border-black/5 bg-white/70 p-5 shadow-sm"
-            >
+            <div key={item.title} className="tsz-card p-5">
               <div className="flex h-9 w-9 items-center justify-center rounded-full border border-ink/10 bg-white/80 text-xs text-ink/60">
                 ✦
               </div>
@@ -101,7 +95,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="fade-in mt-10 space-y-4">
+      <section className="fade-in tsz-section">
         <div className="flex items-end justify-between">
           <div>
             <p className="text-xs uppercase tracking-[0.35em] text-ink/50">
@@ -134,7 +128,7 @@ export default function Home() {
                   <p className="text-sm font-semibold text-ink">
                     {item.title}
                   </p>
-                  <span className="mt-2 inline-flex rounded-full bg-ink/5 px-3 py-1 text-xs text-ink/60">
+                  <span className="mt-2 inline-flex tsz-chip">
                     {item.tag}
                   </span>
                 </div>
@@ -150,10 +144,10 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="fade-in mt-10 space-y-4 rounded-[28px] border border-black/5 bg-white/70 p-6">
+      <section className="fade-in tsz-section rounded-[28px] border border-black/5 bg-white/70 p-6">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold text-ink">今月の招待状</h2>
-          <span className="rounded-full bg-ink/5 px-3 py-1 text-xs text-ink/60">
+          <span className="tsz-chip">
             サンプル
           </span>
         </div>

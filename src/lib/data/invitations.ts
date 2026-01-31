@@ -8,6 +8,7 @@ export type Invitation = {
   slug: string;
   brideName: string;
   groomName: string;
+  mainVisualText: string;
   dateTimeISO: string;
   venueName: string;
   venueAddress: string;
@@ -17,7 +18,20 @@ export type Invitation = {
   scheduleItems: ScheduleItem[];
   mapEmbedUrl?: string;
   paypayReceiveLink?: string;
+  paypayEnabled?: boolean;
+  paypayBrideLink?: string;
+  paypayGroomLink?: string;
+  paypayNotice?: string;
+  paypayGuideText?: string;
   lineShareText?: string;
+  rsvpRequireName?: boolean;
+  rsvpRequireFurigana?: boolean;
+  rsvpAllergyEnabled?: boolean;
+  rsvpCompanionEnabled?: boolean;
+  rsvpShuttleEnabled?: boolean;
+  rsvpSpeechEnabled?: boolean;
+  rsvpDeadline?: string;
+  rsvpNotice?: string;
 };
 
 export const invitations: Invitation[] = [
@@ -25,6 +39,7 @@ export const invitations: Invitation[] = [
     slug: "haru-kai",
     brideName: "春香",
     groomName: "海斗",
+    mainVisualText: "Our Special Day",
     dateTimeISO: "2026-05-17T12:00:00+09:00",
     venueName: "白金レジデンス Chapel",
     venueAddress: "東京都港区白金 1-2-3",
@@ -51,6 +66,7 @@ export const invitations: Invitation[] = [
     slug: "mio-ryo",
     brideName: "美緒",
     groomName: "涼",
+    mainVisualText: "Save the Date",
     dateTimeISO: "2026-04-04T11:30:00+09:00",
     venueName: "鎌倉 Ocean Terrace",
     venueAddress: "神奈川県鎌倉市由比ガ浜 4-8",
@@ -74,6 +90,7 @@ export const invitations: Invitation[] = [
     slug: "sora-yui",
     brideName: "空",
     groomName: "結衣",
+    mainVisualText: "Happily Ever After",
     dateTimeISO: "2026-06-28T16:00:00+09:00",
     venueName: "赤坂 Garden Hall",
     venueAddress: "東京都港区赤坂 6-9-2",

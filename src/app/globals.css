@@ -31,6 +31,49 @@ h4 {
     serif;
 }
 
+@layer base {
+  button,
+  input,
+  select,
+  textarea {
+    min-height: 44px;
+  }
+
+  section {
+    scroll-margin-top: 88px;
+  }
+}
+
+@layer components {
+  .tsz-page {
+    @apply mx-auto w-full max-w-md px-4;
+  }
+
+  .tsz-section {
+    @apply mt-8 space-y-4 sm:mt-10;
+  }
+
+  .tsz-card {
+    @apply rounded-3xl border border-black/5 bg-white/80 shadow-sm;
+  }
+
+  .tsz-card-soft {
+    @apply rounded-3xl border border-black/5 bg-white/70;
+  }
+
+  .tsz-chip {
+    @apply rounded-full bg-ink/5 px-3 py-1 text-xs text-ink/60;
+  }
+
+  .tsz-button-primary {
+    @apply flex h-11 items-center justify-center rounded-full bg-accent px-5 text-sm font-semibold text-white transition-opacity duration-300 hover:opacity-80;
+  }
+
+  .tsz-button-secondary {
+    @apply flex h-11 items-center justify-center rounded-full border border-ink/20 bg-white/70 px-5 text-sm font-medium text-ink transition-opacity duration-300 hover:opacity-80;
+  }
+}
+
 .fade-in {
   animation: fade-in 0.6s ease both;
 }
