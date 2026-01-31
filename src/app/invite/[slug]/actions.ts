@@ -69,7 +69,7 @@ export async function submitRsvp(
   }
 
   try {
-    const dict = getDictionary(validatedFields.data.locale || "ja");
+    const dict = getDictionary(validatedFields.data.locale || "jp");
     const rsvp = await createRSVP({
       invitationSlug: validatedFields.data.invitationSlug,
       lastName: validatedFields.data.lastName ?? "",
@@ -90,7 +90,7 @@ export async function submitRsvp(
     const dict = getDictionary(
       typeof formData.get("locale") === "string"
         ? (formData.get("locale") as string)
-        : "ja"
+        : "jp"
     );
     return {
       message: dict.invite.rsvpError,

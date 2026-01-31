@@ -3,5 +3,5 @@ import { redirect } from "next/navigation";
 export const runtime = "edge";
 
 export default function InviteRedirect({ params }: { params: { slug: string } }) {
-  redirect(`/ja/invite/${params.slug}`);
+  redirect(`/jp/invite/${params.slug}`);
 }

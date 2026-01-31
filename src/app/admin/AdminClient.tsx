@@ -21,8 +21,8 @@ export default function AdminClient({
   locale?: Locale;
   copy?: ReturnType<typeof getDictionary>["admin"];
 }) {
-  const dict = copy ?? getDictionary(locale ?? "ja").admin;
-  const activeLocale = locale ?? "ja";
+  const dict = copy ?? getDictionary(locale ?? "jp").admin;
+  const activeLocale = locale ?? "jp";
   const [invitations, setInvitations] = useState<Invitation[]>([]);
   const [selectedSlug, setSelectedSlug] = useState("");
   const [filters, setFilters] = useState<{

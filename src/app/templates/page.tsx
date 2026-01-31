@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
 
 export default function TemplatesPage() {
-  redirect("/ja/templates");
+  redirect("/jp/templates");
 }

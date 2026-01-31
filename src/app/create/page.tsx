@@ -93,7 +93,7 @@ export default function CreatePage({
   locale?: Locale;
   copy?: ReturnType<typeof getDictionary>["create"];
 }) {
-  const dict = copy ?? getDictionary(locale ?? "ja").create;
+  const dict = copy ?? getDictionary(locale ?? "jp").create;
   const [activeTab, setActiveTab] = useState("basic");
   const [brideName, setBrideName] = useState("陽菜");
   const [groomName, setGroomName] = useState("健人");
@@ -141,9 +141,9 @@ export default function CreatePage({
   );
   const [currentLocale] = useState(() => {
     if (locale) return locale;
-    if (typeof window === "undefined") return "ja";
+    if (typeof window === "undefined") return "jp";
     const segment = window.location.pathname.split("/")[1];
-    return segment || "ja";
+    return segment || "jp";
   });
   const [rsvpRequireName, setRsvpRequireName] = useState(true);
   const [rsvpRequireFurigana, setRsvpRequireFurigana] = useState(true);

@@ -13,7 +13,7 @@ export default function LocaleSwitcher({ current }: LocaleSwitcherProps) {
   const segments = pathname.split("/");
   const active = locales.includes(current as (typeof locales)[number])
     ? current
-    : "ja";
+    : "jp";
 
   return (
     <div className="flex items-center gap-2 text-xs text-ink/60">

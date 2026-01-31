@@ -1,4 +1,4 @@
-export const locales = ["ja", "ko", "en"] as const;
+export const locales = ["jp", "ko", "en"] as const;
 export type Locale = (typeof locales)[number];
 
 type InviteCopy = {
@@ -232,7 +232,7 @@ type Dictionary = {
   invite: InviteCopy;
 };
 
-const ja: Dictionary = {
+const jp: Dictionary = {
   header: {
     menuLabel: "メニューを開く",
     brandKana: "つづぐ",
@@ -980,7 +980,7 @@ const en: Dictionary = {
 };
 
 const dictionaries: Record<Locale, Dictionary> = {
-  ja,
+  jp,
   ko,
   en,
 };
@@ -989,5 +989,5 @@ export function getDictionary(locale: string): Dictionary {
   if (locale in dictionaries) {
     return dictionaries[locale as Locale];
   }
-  return dictionaries.ja;
+  return dictionaries.jp;
 }

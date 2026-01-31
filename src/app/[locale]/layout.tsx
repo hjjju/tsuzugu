@@ -18,7 +18,7 @@ export default async function LocaleLayout({
   const resolvedParams = await Promise.resolve(params);
   const normalizedLocale = locales.includes(resolvedParams.locale as (typeof locales)[number])
     ? (resolvedParams.locale as (typeof locales)[number])
-    : "ja";
+    : "jp";
   const dict = getDictionary(normalizedLocale);
 
   return (

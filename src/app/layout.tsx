@@ -25,7 +25,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ja">
+    <html lang="jp">
       <body
         className={`${notoSans.variable} ${notoSerif.variable} min-h-screen bg-background text-ink antialiased`}
       >
