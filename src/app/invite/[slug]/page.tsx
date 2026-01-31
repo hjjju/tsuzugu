@@ -16,10 +16,18 @@ export async function generateMetadata({
   const coupleName = invite
     ? `${invite.brideName} & ${invite.groomName}`
     : "ご招待";
+  const eventDate = invite
+    ? new Intl.DateTimeFormat("ja-JP", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+        weekday: "short",
+      }).format(new Date(invite.dateTimeISO))
+    : "";
   const description = invite
-    ? `${invite.brideName}と${invite.groomName}の結婚式のご案内です。ご都合をご返信ください。`
+    ? `${invite.brideName}と${invite.groomName}の結婚式のご案内です。${eventDate}、${invite.venueName}にてお待ちしております。`
     : "結婚式のご案内ページです。";
-  const image = invite?.heroImageUrl || "/images/og-default.jpg";
+  const image = invite?.heroImageUrl || "/og-default.jpg";
 
   return {
     title: `つづぐ | ${coupleName} ご招待`,

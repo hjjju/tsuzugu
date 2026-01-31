@@ -1,0 +1,39 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "rsvps",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "invitationSlug", "order": "ASCENDING" },
+        { "fieldPath": "createdAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "rsvps",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "invitationSlug", "order": "ASCENDING" },
+        { "fieldPath": "attendance", "order": "ASCENDING" },
+        { "fieldPath": "createdAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "rsvps",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "invitationSlug", "order": "ASCENDING" },
+        { "fieldPath": "allergyFlag", "order": "ASCENDING" },
+        { "fieldPath": "createdAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "rsvps",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "invitationSlug", "order": "ASCENDING" },
+        { "fieldPath": "qrToken", "order": "ASCENDING" }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}

@@ -1,0 +1,21 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /invitations/{slug} {
+      allow read: if true;
+    }
+
+    match /rsvps/{rsvpId} {
+      allow create: if request.resource.data.invitationSlug is string
+        && request.resource.data.attendance in ["attend", "decline"]
+        && request.resource.data.furigana is string
+        && request.resource.data.qrToken is string
+        && request.resource.data.createdAt is timestamp
+        && request.resource.data.checkedInAt == null;
+
+      // TODO: Restrict read/update after Firebase Auth is configured.
+      allow read, update: if true;
+    }
+  }
+}

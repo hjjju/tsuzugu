@@ -1,49 +1,204 @@
-import { CheckIn, RSVP, checkIns, rsvps } from "@/lib/data/rsvps";
-
-function generateId(prefix: string) {
-  return `${prefix}_${Math.random().toString(36).slice(2, 10)}`;
-}
-
-function generateQrToken() {
-  if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
-    return `qr_${crypto.randomUUID()}`;
-  }
-  return generateId("qr");
-}
+import type { CheckIn, RSVP } from "@/lib/data/rsvps";
+import { firebaseDb } from "@/lib/firebase/client";
+import {
+  addDoc,
+  collection,
+  getDocs,
+  limit,
+  orderBy,
+  query,
+  serverTimestamp,
+  updateDoc,
+  where,
+  type Timestamp,
+  doc,
+  getDoc,
+} from "firebase/firestore";
 
 export type CreateRsvpInput = Omit<RSVP, "id" | "createdAtISO" | "qrToken">;
 
-export function listRSVPs(invitationSlug?: string): RSVP[] {
-  const items = invitationSlug
-    ? rsvps.filter((item) => item.invitationSlug === invitationSlug)
-    : rsvps;
-  return [...items];
+async function generateQrToken(
+  invitationSlug: string
+): Promise<string> {
+  async function randomToken() {
+    if (typeof crypto !== "undefined" && "getRandomValues" in crypto) {
+      const bytes = new Uint8Array(16);
+      crypto.getRandomValues(bytes);
+      return `qr_${Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("")}`;
+    }
+    try {
+      const nodeCrypto = await import("crypto");
+      return `qr_${nodeCrypto.randomBytes(16).toString("hex")}`;
+    } catch {
+      return `qr_${Math.random().toString(36).slice(2, 12)}`;
+    }
+  }
+
+  let token = await randomToken();
+  let attempts = 0;
+  while (attempts < 5) {
+    const tokenQuery = query(
+      collection(firebaseDb, "rsvps"),
+      where("invitationSlug", "==", invitationSlug),
+      where("qrToken", "==", token),
+      limit(1)
+    );
+    const snapshot = await getDocs(tokenQuery);
+    if (snapshot.empty) {
+      return token;
+    }
+    attempts += 1;
+    token = await randomToken();
+  }
+  return token;
 }
 
-export function createRSVP(input: CreateRsvpInput): RSVP {
-  const newRsvp: RSVP = {
-    ...input,
-    id: generateId("rsvp"),
-    createdAtISO: new Date().toISOString(),
-    qrToken: generateQrToken(),
+function timestampToIso(value?: Timestamp | null) {
+  if (!value) return "";
+  return value.toDate().toISOString();
+}
+
+function mapRsvpDoc(id: string, data: Record<string, unknown>): RSVP {
+  return {
+    id,
+    invitationSlug: String(data.invitationSlug ?? ""),
+    lastName: String(data.lastName ?? ""),
+    firstName: String(data.firstName ?? ""),
+    furigana: String(data.furigana ?? ""),
+    email: String(data.email ?? ""),
+    phone: data.phone ? String(data.phone) : undefined,
+    attendance: data.attendance === "decline" ? "decline" : "attend",
+    guestsCount: Number(data.guestsCount ?? 0),
+    allergyText: String(data.allergyText ?? ""),
+    messageToCouple: String(data.messageToCouple ?? ""),
+    createdAtISO: timestampToIso(data.createdAt as Timestamp),
+    qrToken: String(data.qrToken ?? ""),
   };
-  rsvps.push(newRsvp);
-  return newRsvp;
 }
 
-export function checkInByQrToken(qrToken: string): CheckIn | undefined {
-  const rsvp = rsvps.find((item) => item.qrToken === qrToken);
-  if (!rsvp) {
+export async function listRSVPs(invitationSlug?: string): Promise<RSVP[]> {
+  const baseQuery = invitationSlug
+    ? query(
+        collection(firebaseDb, "rsvps"),
+        where("invitationSlug", "==", invitationSlug),
+        orderBy("createdAt", "desc")
+      )
+    : query(collection(firebaseDb, "rsvps"), orderBy("createdAt", "desc"));
+  const snapshot = await getDocs(baseQuery);
+  return snapshot.docs.map((docSnap) => mapRsvpDoc(docSnap.id, docSnap.data()));
+}
+
+export async function createRSVP(
+  invitationSlugOrInput: string | CreateRsvpInput,
+  payload?: CreateRsvpInput
+): Promise<RSVP> {
+  const input =
+    typeof invitationSlugOrInput === "string"
+      ? {
+          ...(payload ?? ({} as CreateRsvpInput)),
+          invitationSlug: invitationSlugOrInput,
+        }
+      : invitationSlugOrInput;
+
+  if (!input || !input.invitationSlug) {
+    throw new Error("invitationSlug is required to create RSVP.");
+  }
+
+  const qrToken = await generateQrToken(input.invitationSlug);
+  const allergyText = input.allergyText ?? "";
+  const rsvpDoc = {
+    invitationSlug: input.invitationSlug,
+    lastName: input.lastName,
+    firstName: input.firstName,
+    furigana: input.furigana,
+    email: input.email,
+    phone: input.phone ?? null,
+    attendance: input.attendance,
+    guestsCount: input.guestsCount,
+    allergyText,
+    allergyFlag: allergyText.trim().length > 0,
+    messageToCouple: input.messageToCouple,
+    qrToken,
+    createdAt: serverTimestamp(),
+    checkedInAt: null,
+  };
+
+  const docRef = await addDoc(collection(firebaseDb, "rsvps"), rsvpDoc);
+  const createdAtISO = new Date().toISOString();
+
+  return {
+    id: docRef.id,
+    invitationSlug: input.invitationSlug,
+    lastName: input.lastName,
+    firstName: input.firstName,
+    furigana: input.furigana,
+    email: input.email,
+    phone: input.phone,
+    attendance: input.attendance,
+    guestsCount: input.guestsCount,
+    allergyText,
+    messageToCouple: input.messageToCouple,
+    createdAtISO,
+    qrToken,
+  };
+}
+
+export async function listCheckIns(
+  invitationSlug?: string
+): Promise<CheckIn[]> {
+  const baseQuery = invitationSlug
+    ? query(
+        collection(firebaseDb, "rsvps"),
+        where("invitationSlug", "==", invitationSlug)
+      )
+    : query(collection(firebaseDb, "rsvps"));
+  const snapshot = await getDocs(baseQuery);
+  return snapshot.docs
+    .map((docSnap) => {
+      const data = docSnap.data();
+      const checkedInAt = data.checkedInAt as Timestamp | null;
+      if (!checkedInAt) {
+        return null;
+      }
+      return {
+        rsvpId: docSnap.id,
+        checkedInAtISO: checkedInAt.toDate().toISOString(),
+      } as CheckIn;
+    })
+    .filter(Boolean) as CheckIn[];
+}
+
+export async function checkInByQrToken(
+  invitationSlugOrQrToken: string,
+  qrToken?: string
+): Promise<CheckIn | undefined> {
+  const invitationSlug =
+    qrToken !== undefined ? invitationSlugOrQrToken : undefined;
+  const token = qrToken ?? invitationSlugOrQrToken;
+
+  const queryParts = [where("qrToken", "==", token)] as ReturnType<
+    typeof where
+  >[];
+  if (invitationSlug) {
+    queryParts.unshift(where("invitationSlug", "==", invitationSlug));
+  }
+
+  const q = query(collection(firebaseDb, "rsvps"), ...queryParts, limit(1));
+  const snapshot = await getDocs(q);
+  if (snapshot.empty) {
     return undefined;
   }
-  const existing = checkIns.find((checkIn) => checkIn.rsvpId === rsvp.id);
-  if (existing) {
-    return existing;
-  }
-  const newCheckIn: CheckIn = {
-    rsvpId: rsvp.id,
-    checkedInAtISO: new Date().toISOString(),
+
+  const docSnap = snapshot.docs[0];
+  await updateDoc(doc(firebaseDb, "rsvps", docSnap.id), {
+    checkedInAt: serverTimestamp(),
+  });
+  const refreshed = await getDoc(doc(firebaseDb, "rsvps", docSnap.id));
+  const data = refreshed.data();
+  const checkedInAt = data?.checkedInAt as Timestamp | null;
+
+  return {
+    rsvpId: docSnap.id,
+    checkedInAtISO: checkedInAt ? checkedInAt.toDate().toISOString() : "",
   };
-  checkIns.push(newCheckIn);
-  return newCheckIn;
 }
