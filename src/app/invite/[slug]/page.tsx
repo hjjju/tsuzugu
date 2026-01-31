@@ -3,8 +3,9 @@ import { notFound } from "next/navigation";
 import InviteClient from "./InviteClient";
 import { getInvitationBySlug, listInvitations } from "@/lib/services/invitations";
 
-export function generateStaticParams() {
-  return listInvitations().map((invite) => ({ slug: invite.slug }));
+export async function generateStaticParams() {
+  const invites = await listInvitations();
+  return invites.map((invite) => ({ slug: invite.slug }));
 }
 
 export async function generateMetadata({
@@ -12,7 +13,7 @@ export async function generateMetadata({
 }: {
   params: { slug: string };
 }): Promise<Metadata> {
-  const invite = getInvitationBySlug(params.slug);
+  const invite = await getInvitationBySlug(params.slug);
   const coupleName = invite
     ? `${invite.brideName} & ${invite.groomName}`
     : "ご招待";
@@ -41,8 +42,12 @@ export async function generateMetadata({
   };
 }
 
-export default function InvitePage({ params }: { params: { slug: string } }) {
-  const invite = getInvitationBySlug(params.slug);
+export default async function InvitePage({
+  params,
+}: {
+  params: { slug: string };
+}) {
+  const invite = await getInvitationBySlug(params.slug);
 
   if (!invite) {
     notFound();

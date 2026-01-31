@@ -78,9 +78,9 @@ export default function InviteClient({ invitation }: InviteClientProps) {
     setFormState((prev) => ({ ...prev, [key]: value }));
   }
 
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const rsvp = createRSVP({
+    const rsvp = await createRSVP({
       invitationSlug: invitation.slug,
       lastName: formState.lastName,
       firstName: formState.firstName,

@@ -1,19 +1,7 @@
 import type { CheckIn, RSVP } from "@/lib/data/rsvps";
-import { firebaseDb } from "@/lib/firebase/client";
-import {
-  addDoc,
-  collection,
-  getDocs,
-  limit,
-  orderBy,
-  query,
-  serverTimestamp,
-  updateDoc,
-  where,
-  type Timestamp,
-  doc,
-  getDoc,
-} from "firebase/firestore";
+import { isFirebaseConfigReady } from "@/lib/firebase/config";
+import { getFirebaseDb } from "@/lib/firebase/client";
+import type { Timestamp } from "firebase/firestore";
 
 export type CreateRsvpInput = Omit<RSVP, "id" | "createdAtISO" | "qrToken">;
 
@@ -34,11 +22,18 @@ async function generateQrToken(
     }
   }
 
+  if (!isFirebaseConfigReady) {
+    return randomToken();
+  }
+
   let token = await randomToken();
   let attempts = 0;
   while (attempts < 5) {
+    const firebaseDb = await getDb();
+    const { collection, getDocs, limit, query, where } =
+      await getFirestoreModule();
     const tokenQuery = query(
-      collection(firebaseDb, "rsvps"),
+      collection(firebaseDb as any, "rsvps"),
       where("invitationSlug", "==", invitationSlug),
       where("qrToken", "==", token),
       limit(1)
@@ -51,6 +46,18 @@ async function generateQrToken(
     token = await randomToken();
   }
   return token;
+}
+
+async function getFirestoreModule() {
+  return import(/* webpackIgnore: true */ "firebase/firestore");
+}
+
+async function getDb() {
+  return getFirebaseDb();
+}
+
+function generateFallbackId(prefix: string) {
+  return `${prefix}_${Math.random().toString(36).slice(2, 10)}`;
 }
 
 function timestampToIso(value?: Timestamp | null) {
@@ -77,13 +84,22 @@ function mapRsvpDoc(id: string, data: Record<string, unknown>): RSVP {
 }
 
 export async function listRSVPs(invitationSlug?: string): Promise<RSVP[]> {
+  if (!isFirebaseConfigReady) {
+    return [];
+  }
+  const firebaseDb = await getDb();
+  const { collection, getDocs, orderBy, query, where } =
+    await getFirestoreModule();
   const baseQuery = invitationSlug
     ? query(
-        collection(firebaseDb, "rsvps"),
+        collection(firebaseDb as any, "rsvps"),
         where("invitationSlug", "==", invitationSlug),
         orderBy("createdAt", "desc")
       )
-    : query(collection(firebaseDb, "rsvps"), orderBy("createdAt", "desc"));
+    : query(
+        collection(firebaseDb as any, "rsvps"),
+        orderBy("createdAt", "desc")
+      );
   const snapshot = await getDocs(baseQuery);
   return snapshot.docs.map((docSnap) => mapRsvpDoc(docSnap.id, docSnap.data()));
 }
@@ -104,6 +120,28 @@ export async function createRSVP(
     throw new Error("invitationSlug is required to create RSVP.");
   }
 
+  if (!isFirebaseConfigReady) {
+    const allergyText = input.allergyText ?? "";
+    const qrToken = await generateQrToken(input.invitationSlug);
+    return {
+      id: generateFallbackId("rsvp"),
+      invitationSlug: input.invitationSlug,
+      lastName: input.lastName,
+      firstName: input.firstName,
+      furigana: input.furigana,
+      email: input.email,
+      phone: input.phone,
+      attendance: input.attendance,
+      guestsCount: input.guestsCount,
+      allergyText,
+      messageToCouple: input.messageToCouple,
+      createdAtISO: new Date().toISOString(),
+      qrToken,
+    };
+  }
+
+  const firebaseDb = await getDb();
+  const { addDoc, collection, serverTimestamp } = await getFirestoreModule();
   const qrToken = await generateQrToken(input.invitationSlug);
   const allergyText = input.allergyText ?? "";
   const rsvpDoc = {
@@ -123,7 +161,7 @@ export async function createRSVP(
     checkedInAt: null,
   };
 
-  const docRef = await addDoc(collection(firebaseDb, "rsvps"), rsvpDoc);
+  const docRef = await addDoc(collection(firebaseDb as any, "rsvps"), rsvpDoc);
   const createdAtISO = new Date().toISOString();
 
   return {
@@ -146,12 +184,17 @@ export async function createRSVP(
 export async function listCheckIns(
   invitationSlug?: string
 ): Promise<CheckIn[]> {
+  if (!isFirebaseConfigReady) {
+    return [];
+  }
+  const firebaseDb = await getDb();
+  const { collection, getDocs, query, where } = await getFirestoreModule();
   const baseQuery = invitationSlug
     ? query(
-        collection(firebaseDb, "rsvps"),
+        collection(firebaseDb as any, "rsvps"),
         where("invitationSlug", "==", invitationSlug)
       )
-    : query(collection(firebaseDb, "rsvps"));
+    : query(collection(firebaseDb as any, "rsvps"));
   const snapshot = await getDocs(baseQuery);
   return snapshot.docs
     .map((docSnap) => {
@@ -172,6 +215,21 @@ export async function checkInByQrToken(
   invitationSlugOrQrToken: string,
   qrToken?: string
 ): Promise<CheckIn | undefined> {
+  if (!isFirebaseConfigReady) {
+    return undefined;
+  }
+  const firebaseDb = await getDb();
+  const {
+    collection,
+    getDocs,
+    limit,
+    query,
+    updateDoc,
+    where,
+    getDoc,
+    doc,
+    serverTimestamp,
+  } = await getFirestoreModule();
   const invitationSlug =
     qrToken !== undefined ? invitationSlugOrQrToken : undefined;
   const token = qrToken ?? invitationSlugOrQrToken;
@@ -183,17 +241,21 @@ export async function checkInByQrToken(
     queryParts.unshift(where("invitationSlug", "==", invitationSlug));
   }
 
-  const q = query(collection(firebaseDb, "rsvps"), ...queryParts, limit(1));
+  const q = query(
+    collection(firebaseDb as any, "rsvps"),
+    ...queryParts,
+    limit(1)
+  );
   const snapshot = await getDocs(q);
   if (snapshot.empty) {
     return undefined;
   }
 
   const docSnap = snapshot.docs[0];
-  await updateDoc(doc(firebaseDb, "rsvps", docSnap.id), {
+  await updateDoc(doc(firebaseDb as any, "rsvps", docSnap.id), {
     checkedInAt: serverTimestamp(),
   });
-  const refreshed = await getDoc(doc(firebaseDb, "rsvps", docSnap.id));
+  const refreshed = await getDoc(doc(firebaseDb as any, "rsvps", docSnap.id));
   const data = refreshed.data();
   const checkedInAt = data?.checkedInAt as Timestamp | null;
 
