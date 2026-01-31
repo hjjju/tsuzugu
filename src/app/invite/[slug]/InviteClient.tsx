@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import type { Invitation } from "@/lib/data/invitations";
 import { createRSVP } from "@/lib/services/rsvps";
 import { copyJa } from "@/lib/copy/ja";
@@ -32,19 +32,15 @@ const emptyForm: RsvpFormState = {
 };
 
 export default function InviteClient({ invitation }: InviteClientProps) {
-  const [currentUrl, setCurrentUrl] = useState("");
+  const [currentUrl] = useState(() =>
+    typeof window !== "undefined" ? window.location.href : ""
+  );
   const [galleryIndex, setGalleryIndex] = useState<number | null>(null);
   const [showPaypayModal, setShowPaypayModal] = useState(false);
   const [formState, setFormState] = useState<RsvpFormState>(emptyForm);
   const [qrToken, setQrToken] = useState<string | null>(null);
   const [submitMessage, setSubmitMessage] = useState<string | null>(null);
   const [copyNotice, setCopyNotice] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      setCurrentUrl(window.location.href);
-    }
-  }, []);
 
   const galleryImages = useMemo(() => {
     const base = [invitation.heroImageUrl, ...invitation.galleryImageUrls];

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
 import { createInvitation } from "@/lib/services/invitations";
 
@@ -75,16 +75,12 @@ export default function CreatePage() {
   const [paypayReceiveLink, setPaypayReceiveLink] = useState("");
   const [createdSlug, setCreatedSlug] = useState<string | null>(null);
   const [submitNotice, setSubmitNotice] = useState<string | null>(null);
-  const [baseUrl, setBaseUrl] = useState("");
+  const [baseUrl] = useState(() =>
+    typeof window !== "undefined" ? window.location.origin : ""
+  );
 
   const selectedTemplate =
     templates.find((template) => template.key === templateKey) || templates[0];
-
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      setBaseUrl(window.location.origin);
-    }
-  }, []);
 
   const galleryImageUrls = useMemo(
     () => normalizeGallery(galleryInput),
