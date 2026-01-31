@@ -2,13 +2,10 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import type { Locale } from "@/lib/i18n";
 import { getDictionary } from "@/lib/i18n";
-import { getInvitationBySlug, listInvitations } from "@/lib/services/invitations";
+import { getInvitationBySlug } from "@/lib/services/invitations";
 import InviteClient from "../../../invite/[slug]/InviteClient";
 
-export async function generateStaticParams() {
-  const invites = await listInvitations();
-  return invites.map((invite) => ({ slug: invite.slug }));
-}
+export const runtime = "edge";
 
 export async function generateMetadata({
   params,

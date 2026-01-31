@@ -2,6 +2,8 @@ import type { Locale } from "@/lib/i18n";
 import { getDictionary } from "@/lib/i18n";
 import Link from "next/link";
 
+export const runtime = "edge";
+
 const templateCards = [
   {
     key: "classic",

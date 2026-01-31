@@ -15,12 +15,7 @@ async function generateQrToken(
       crypto.getRandomValues(bytes);
       return `qr_${Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("")}`;
     }
-    try {
-      const nodeCrypto = await import("crypto");
-      return `qr_${nodeCrypto.randomBytes(16).toString("hex")}`;
-    } catch {
-      return `qr_${Math.random().toString(36).slice(2, 12)}`;
-    }
+    return `qr_${Math.random().toString(36).slice(2, 12)}`;
   }
 
   if (!isFirebaseConfigReady) {

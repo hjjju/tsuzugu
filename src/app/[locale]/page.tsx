@@ -2,6 +2,8 @@ import type { Locale } from "@/lib/i18n";
 import { getDictionary } from "@/lib/i18n";
 import Link from "next/link";
 
+export const runtime = "edge";
+
 export default function LocaleHomePage({ params }: { params: { locale: Locale } }) {
   const dict = getDictionary(params.locale);
 
