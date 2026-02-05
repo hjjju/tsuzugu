@@ -6,25 +6,30 @@ export const runtime = "edge";
 
 const templateCards = [
   {
-    key: "classic",
-    image: "/images/invite/sample/hero.jpg",
+    key: "romantic",
+    gradient: "linear-gradient(135deg, #f9e9e3, #f3f6f8)",
   },
   {
-    key: "nature",
-    image: "/images/invite/sample/gallery-01.jpg",
+    key: "minimal",
+    gradient: "linear-gradient(135deg, #f5f1e8, #f0f4f7)",
   },
   {
     key: "modern",
-    image: "/images/invite/sample/gallery-02.jpg",
+    gradient: "linear-gradient(135deg, #edf2f6, #f7efe9)",
+  },
+  {
+    key: "japanese-modern",
+    gradient: "linear-gradient(135deg, #f6ece9, #f2f5ee)",
   },
 ];
 
 export default function TemplatesPage({ params }: { params: { locale: Locale } }) {
   const dict = getDictionary(params.locale);
   const tags = [
-    dict.home.templateClassic,
-    dict.home.templateNature,
-    dict.home.templateModern,
+    dict.home.template1Title,
+    dict.home.template2Title,
+    dict.home.template3Title,
+    dict.home.template4Title,
   ];
 
   return (
@@ -34,12 +39,12 @@ export default function TemplatesPage({ params }: { params: { locale: Locale } }
           <h1 className="font-display text-2xl text-ink">{dict.templates.title}</h1>
           <p className="text-sm text-ink/60">{dict.templates.subtitle}</p>
         </div>
-        <div className="grid gap-6 md:grid-cols-3">
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
           {templateCards.map((card, index) => (
             <div key={card.key} className="tsz-card overflow-hidden">
               <div
                 className="h-48 bg-cover bg-center"
-                style={{ backgroundImage: `url(${card.image})` }}
+                style={{ backgroundImage: card.gradient }}
               />
               <div className="space-y-3 p-4">
                 <span className="inline-flex rounded-full bg-black/5 px-3 py-1 text-xs text-ink/70">
