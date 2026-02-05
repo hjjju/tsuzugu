@@ -446,7 +446,7 @@ const jp: Dictionary = {
     heroTitle: "写真とストーリーで伝える、ふたりだけのWEB招待状",
     heroSubtitle:
       "紙の招待状よりも手軽に、アルバムよりも特別に。スマホひとつで、ゲストにやさしい体験を届けます。",
-    heroPrimary: "無料で作ってみる",
+    heroPrimary: "招待状を作る",
     heroSecondary: "テンプレートを見る",
     heroNote: "最短10分で完成・LINEで共有",
     featureTitle: "特徴",
