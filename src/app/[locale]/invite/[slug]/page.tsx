@@ -4,6 +4,7 @@ import type { Locale } from "@/lib/i18n";
 import { getDictionary } from "@/lib/i18n";
 import { getInvitationBySlug } from "@/lib/services/invitations";
 import InviteClient from "../../../invite/[slug]/InviteClient";
+import GuestInviteClient from "./GuestInviteClient";
 
 export const runtime = "edge";
 
@@ -35,9 +36,15 @@ export async function generateMetadata({
 
 export default async function InvitePage({
   params,
+  searchParams,
 }: {
   params: { slug: string; locale: Locale };
+  searchParams?: { data?: string };
 }) {
+  if (searchParams?.data) {
+    return <GuestInviteClient data={searchParams.data} />;
+  }
+
   const invite = await getInvitationBySlug(params.slug);
 
   if (!invite) {
