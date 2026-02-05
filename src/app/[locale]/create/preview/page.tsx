@@ -5,13 +5,21 @@ import { useRouter } from "next/navigation";
 import InviteGuestView from "@/components/InviteGuestView";
 import { useCreateFlow } from "@/components/CreateFlowProvider";
 
+function encodeInvitationData(data: ReturnType<typeof useCreateFlow>["draft"]) {
+  const json = JSON.stringify(data);
+  return btoa(unescape(encodeURIComponent(json)));
+}
+
 export default function CreatePreviewPage() {
   const router = useRouter();
   const { draft, ensureInviteId, inviteId, saveDraftToStorage } = useCreateFlow();
   const [copied, setCopied] = useState(false);
 
   const id = ensureInviteId();
-  const invitePath = useMemo(() => `/jp/invite/${id}`, [id]);
+  const invitePath = useMemo(() => {
+    const encoded = encodeInvitationData(draft);
+    return `/jp/invite?id=${id}&data=${encoded}`;
+  }, [draft, id]);
 
   const handleCopy = async () => {
     try {

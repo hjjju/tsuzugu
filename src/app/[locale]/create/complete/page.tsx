@@ -7,7 +7,7 @@ import { useCreateFlow } from "@/components/CreateFlowProvider";
 export default function CreateCompletePage() {
   const { ensureInviteId } = useCreateFlow();
   const inviteId = ensureInviteId();
-  const invitePath = useMemo(() => `/jp/invite/${inviteId}`, [inviteId]);
+  const invitePath = useMemo(() => `/jp/invite?id=${inviteId}`, [inviteId]);
 
   return (
     <div className="bg-[#f9f8f6] px-4 pb-16 pt-10">

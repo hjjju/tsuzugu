@@ -3,29 +3,32 @@
 import { useEffect, useState } from "react";
 import InviteGuestView, { type InvitationDraft } from "@/components/InviteGuestView";
 
+function decodeInvitationData(encoded: string): InvitationDraft | null {
+  try {
+    const json = decodeURIComponent(escape(atob(encoded)));
+    return JSON.parse(json) as InvitationDraft;
+  } catch {
+    return null;
+  }
+}
+
 export default function GuestInviteClient({
-  slug,
+  inviteId,
   encodedData,
 }: {
-  slug: string;
+  inviteId?: string;
   encodedData?: string;
 }) {
   const [inviteData, setInviteData] = useState<InvitationDraft | null>(null);
 
   useEffect(() => {
     if (encodedData) {
-      try {
-        const json = decodeURIComponent(escape(atob(encodedData)));
-        setInviteData(JSON.parse(json) as InvitationDraft);
-        return;
-      } catch {
-        setInviteData(null);
-        return;
-      }
+      setInviteData(decodeInvitationData(encodedData));
+      return;
     }
 
-    if (typeof window !== "undefined") {
-      const stored = window.sessionStorage.getItem(`tsz-invite-${slug}`);
+    if (typeof window !== "undefined" && inviteId) {
+      const stored = window.sessionStorage.getItem(`tsz-invite-${inviteId}`);
       if (stored) {
         try {
           setInviteData(JSON.parse(stored) as InvitationDraft);
@@ -35,7 +38,7 @@ export default function GuestInviteClient({
         }
       }
     }
-  }, [encodedData, slug]);
+  }, [encodedData, inviteId]);
 
   if (!inviteData) {
     return (
