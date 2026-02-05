@@ -205,10 +205,12 @@ type Dictionary = {
     lineShareTemplate: string;
   };
   home: {
+    heroKicker: string;
     heroTitle: string;
     heroSubtitle: string;
     heroPrimary: string;
     heroSecondary: string;
+    heroNote: string;
     featureTitle: string;
     featureSubtitle: string;
     feature1Title: string;
@@ -217,12 +219,54 @@ type Dictionary = {
     feature2Desc: string;
     feature3Title: string;
     feature3Desc: string;
+    feature4Title: string;
+    feature4Desc: string;
     templatesTitle: string;
     templatesSubtitle: string;
-    templateClassic: string;
-    templateNature: string;
-    templateModern: string;
+    template1Title: string;
+    template1Desc: string;
+    template2Title: string;
+    template2Desc: string;
+    template3Title: string;
+    template3Desc: string;
+    template4Title: string;
+    template4Desc: string;
     templateView: string;
+    stepsTitle: string;
+    stepsSubtitle: string;
+    step1Title: string;
+    step1Desc: string;
+    step2Title: string;
+    step2Desc: string;
+    step3Title: string;
+    step3Desc: string;
+    priceTitle: string;
+    priceSubtitle: string;
+    priceFreeTitle: string;
+    priceFreePrice: string;
+    priceFreeDesc1: string;
+    priceFreeDesc2: string;
+    priceFreeDesc3: string;
+    pricePaidTitle: string;
+    pricePaidPrice: string;
+    pricePaidDesc1: string;
+    pricePaidDesc2: string;
+    pricePaidDesc3: string;
+    priceNote: string;
+    faqTitle: string;
+    faq1Q: string;
+    faq1A: string;
+    faq2Q: string;
+    faq2A: string;
+    faq3Q: string;
+    faq3A: string;
+    faq4Q: string;
+    faq4A: string;
+    faq5Q: string;
+    faq5A: string;
+    ctaTitle: string;
+    ctaSubtitle: string;
+    ctaPrimary: string;
   };
   templates: {
     title: string;
@@ -398,28 +442,73 @@ const jp: Dictionary = {
     lineShareTemplate: "{bride}と{groom}の招待状です。ご確認ください。",
   },
   home: {
-    heroTitle: "想いをつづり、縁をつなぐ。",
+    heroKicker: "モバイル招待状サービス",
+    heroTitle: "写真とストーリーで伝える、ふたりだけのWEB招待状",
     heroSubtitle:
-      "日本の礼儀と、韓国の感性をかけ合わせたウェディング招待状サービス",
-    heroPrimary: "無料で招待状を作成",
-    heroSecondary: "サンプルを見る",
-    featureTitle: "Tsuzuguの特徴",
-    featureSubtitle: "上質で丁寧な体験を、スマートに。",
-    feature1Title: "感性デザイン",
+      "紙の招待状よりも手軽に、アルバムよりも特別に。スマホひとつで、ゲストにやさしい体験を届けます。",
+    heroPrimary: "無料で作ってみる",
+    heroSecondary: "テンプレートを見る",
+    heroNote: "最短10分で完成・LINEで共有",
+    featureTitle: "特徴",
+    featureSubtitle: "ふたりらしさと使いやすさを両立。",
+    feature1Title: "写真が主役のWEB招待状",
     feature1Desc:
-      "韓国の洗練されたデザインをもとに、お二人だけの特別なウェブ招待状を作成できます。",
-    feature2Title: "スマートRSVP",
+      "大きな写真と余白で、ふたりのストーリーを美しく見せます。",
+    feature2Title: "ゲストに優しいスマホ設計",
     feature2Desc:
-      "出欠確認はもちろん、アレルギー情報や同伴者管理まで。回答結果は一覧で確認できます。",
-    feature3Title: "手数料0円の事前決済",
+      "縦スクロール中心のシンプル設計。文字もボタンも読みやすく。",
+    feature3Title: "LINEでURLを送るだけ",
     feature3Desc:
-      "PayPay連携により、安心・安全に事前のご祝儀受付が可能です。",
-    templatesTitle: "テンプレートプレビュー",
-    templatesSubtitle: "雰囲気に合わせた3つのスタイルをご用意しています。",
-    templateClassic: "Classic",
-    templateNature: "Nature",
-    templateModern: "Modern",
-    templateView: "詳しく見る",
+      "リンクをコピーしてLINEで送信。アプリ不要でアクセスできます。",
+    feature4Title: "多言語対応もOK",
+    feature4Desc: "日本語／英語／韓国語に対応。海外ゲストにも安心です。",
+    templatesTitle: "テンプレートギャラリー",
+    templatesSubtitle: "雰囲気に合わせて選べる4スタイル。",
+    template1Title: "Romantic",
+    template1Desc: "淡い花と余白でやさしく",
+    template2Title: "Minimal",
+    template2Desc: "シンプルで上品に",
+    template3Title: "Modern",
+    template3Desc: "洗練された都会的デザイン",
+    template4Title: "和モダン",
+    template4Desc: "和の要素をさりげなく",
+    templateView: "プレビューを見る",
+    stepsTitle: "作り方",
+    stepsSubtitle: "3ステップで完成。",
+    step1Title: "テンプレートを選ぶ",
+    step1Desc: "好みの雰囲気からスタート。",
+    step2Title: "写真と情報を入力",
+    step2Desc: "日程・会場・地図・RSVPを登録。",
+    step3Title: "URLをLINEで送る",
+    step3Desc: "ゲストにそのまま共有できます。",
+    priceTitle: "料金",
+    priceSubtitle: "まずは無料で試して、気に入ったら本番に。",
+    priceFreeTitle: "フリープラン",
+    priceFreePrice: "¥0",
+    priceFreeDesc1: "全テンプレート閲覧",
+    priceFreeDesc2: "サンプル作成・共有",
+    priceFreeDesc3: "透かしありプレビュー",
+    pricePaidTitle: "ワンタイムプラン",
+    pricePaidPrice: "¥3,980（税込）",
+    pricePaidDesc1: "透かしなし公開URL",
+    pricePaidDesc2: "写真・文章の更新無制限",
+    pricePaidDesc3: "RSVP・地図・LINE共有",
+    priceNote: "※ 料金はリリース時に変更される場合があります。",
+    faqTitle: "よくある質問",
+    faq1Q: "招待状はどのくらいの期間公開されますか？",
+    faq1A:
+      "公開から12ヶ月間はそのまま閲覧できます。延長も予定しています。",
+    faq2Q: "ゲストはアプリを入れる必要がありますか？",
+    faq2A: "不要です。URLを開くだけで閲覧できます。",
+    faq3Q: "あとから内容を変更できますか？",
+    faq3A: "はい。写真や文章、日程など何度でも更新できます。",
+    faq4Q: "支払い方法は何がありますか？",
+    faq4A: "現在はクレジットカード決済を準備中です。",
+    faq5Q: "海外ゲスト向けに英語表示できますか？",
+    faq5A: "はい。日本語／英語／韓国語に切り替え可能です。",
+    ctaTitle: "まずは無料で作ってみませんか？",
+    ctaSubtitle: "登録は1分。テンプレート選びから始めましょう。",
+    ctaPrimary: "無料で作ってみる",
   },
   templates: {
     title: "テンプレート一覧",
@@ -647,28 +736,70 @@ const ko: Dictionary = {
     lineShareTemplate: "{bride}과 {groom}의 초대장입니다. 확인해 주세요.",
   },
   home: {
-    heroTitle: "마음을 잇고, 인연을 잇다.",
+    heroKicker: "모바일 초대장 서비스",
+    heroTitle: "사진과 스토리로 전하는 두 사람만의 WEB 초대장",
     heroSubtitle:
-      "일본의 예의와 한국의 감성을 담은 모바일 웨딩 초대장 서비스",
-    heroPrimary: "무료로 초대장 만들기",
-    heroSecondary: "샘플 보기",
-    featureTitle: "Tsuzugu 특징",
-    featureSubtitle: "품격 있는 경험을 스마트하게.",
-    feature1Title: "감성 디자인",
-    feature1Desc:
-      "한국의 세련된 감성을 기반으로 두 분만의 특별한 웹 초대장을 만들 수 있습니다.",
-    feature2Title: "스마트 RSVP",
+      "종이 초대장보다 간편하게, 앨범보다 특별하게. 스마트폰 하나로 게스트에게 따뜻한 경험을 전합니다.",
+    heroPrimary: "무료로 시작하기",
+    heroSecondary: "템플릿 보기",
+    heroNote: "10분이면 완성 · LINE 공유",
+    featureTitle: "특징",
+    featureSubtitle: "둘만의 감성과 사용성을 함께.",
+    feature1Title: "사진이 주인공인 WEB 초대장",
+    feature1Desc: "큰 사진과 여백으로 스토리를 아름답게 보여줍니다.",
+    feature2Title: "게스트 친화적인 모바일 설계",
     feature2Desc:
-      "출결 확인은 물론 알레르기 정보와 동반자 관리까지. 응답 결과를 한눈에 확인합니다.",
-    feature3Title: "수수료 0원 사전 결제",
-    feature3Desc:
-      "PayPay 연동으로 안전하게 사전 축의금을 받을 수 있습니다.",
-    templatesTitle: "템플릿 미리보기",
-    templatesSubtitle: "분위기에 맞춘 3가지 스타일을 준비했습니다.",
-    templateClassic: "Classic",
-    templateNature: "Nature",
-    templateModern: "Modern",
-    templateView: "자세히 보기",
+      "세로 스크롤 중심, 큰 글씨와 버튼으로 읽기 쉽습니다.",
+    feature3Title: "LINE으로 URL만 보내면 끝",
+    feature3Desc: "링크 복사 후 LINE으로 전송. 앱 설치 필요 없음.",
+    feature4Title: "다국어 지원",
+    feature4Desc: "일본어/영어/한국어 지원. 해외 게스트도 OK.",
+    templatesTitle: "템플릿 갤러리",
+    templatesSubtitle: "분위기에 맞춘 4가지 스타일.",
+    template1Title: "Romantic",
+    template1Desc: "부드러운 꽃과 여백",
+    template2Title: "Minimal",
+    template2Desc: "심플하고 고급스럽게",
+    template3Title: "Modern",
+    template3Desc: "세련된 도시 감성",
+    template4Title: "와모던",
+    template4Desc: "은은한 일본식 포인트",
+    templateView: "미리보기",
+    stepsTitle: "만드는 방법",
+    stepsSubtitle: "3단계로 완성.",
+    step1Title: "템플릿 선택",
+    step1Desc: "원하는 무드에서 시작.",
+    step2Title: "사진과 정보 입력",
+    step2Desc: "일정·장소·지도·RSVP를 등록.",
+    step3Title: "URL을 LINE으로 공유",
+    step3Desc: "게스트에게 바로 전송.",
+    priceTitle: "가격",
+    priceSubtitle: "먼저 무료로 체험하고, 마음에 들면 본격적으로.",
+    priceFreeTitle: "무료 플랜",
+    priceFreePrice: "¥0",
+    priceFreeDesc1: "모든 템플릿 열람",
+    priceFreeDesc2: "샘플 생성·공유",
+    priceFreeDesc3: "워터마크 프리뷰",
+    pricePaidTitle: "원타임 플랜",
+    pricePaidPrice: "¥3,980（税込）",
+    pricePaidDesc1: "워터마크 없는 공개 URL",
+    pricePaidDesc2: "사진·문구 무제한 수정",
+    pricePaidDesc3: "RSVP·지도·LINE 공유",
+    priceNote: "※ 출시 시 가격이 변경될 수 있습니다.",
+    faqTitle: "자주 묻는 질문",
+    faq1Q: "초대장 공개 기간은 얼마나 되나요?",
+    faq1A: "공개 후 12개월 동안 열람 가능합니다. 연장도 준비 중입니다.",
+    faq2Q: "게스트가 앱을 설치해야 하나요?",
+    faq2A: "필요 없습니다. URL만 열면 됩니다.",
+    faq3Q: "나중에 내용을 변경할 수 있나요?",
+    faq3A: "네. 사진과 문구, 일정 등을 언제든 수정할 수 있습니다.",
+    faq4Q: "결제 방법은 어떻게 되나요?",
+    faq4A: "현재는 카드 결제를 준비 중입니다.",
+    faq5Q: "해외 게스트를 위해 영어로 표시되나요?",
+    faq5A: "네. 일본어/영어/한국어 전환이 가능합니다.",
+    ctaTitle: "무료로 만들어 볼까요?",
+    ctaSubtitle: "1분이면 시작됩니다. 템플릿부터 골라보세요.",
+    ctaPrimary: "무료로 시작하기",
   },
   templates: {
     title: "템플릿 목록",
@@ -896,28 +1027,70 @@ const en: Dictionary = {
     lineShareTemplate: "Invitation from {bride} & {groom}. Please review.",
   },
   home: {
-    heroTitle: "We write our story, and connect our bonds.",
+    heroKicker: "Mobile invitation service",
+    heroTitle: "A web invitation that tells your story with photos",
     heroSubtitle:
-      "A wedding invitation service blending Japanese etiquette with Korean sensibility",
-    heroPrimary: "Create for free",
-    heroSecondary: "View samples",
-    featureTitle: "Why Tsuzugu",
-    featureSubtitle: "Elegant, considerate, and smart.",
-    feature1Title: "Emotive Design",
-    feature1Desc:
-      "Create a special web invitation inspired by refined Korean aesthetics.",
-    feature2Title: "Smart RSVP",
-    feature2Desc:
-      "Manage attendance, allergies, and companions at a glance.",
-    feature3Title: "Zero-fee Pre-gifts",
-    feature3Desc:
-      "Accept safe, direct PayPay gifts ahead of the ceremony.",
-    templatesTitle: "Template Preview",
-    templatesSubtitle: "Three styles to match your celebration.",
-    templateClassic: "Classic",
-    templateNature: "Nature",
-    templateModern: "Modern",
-    templateView: "View details",
+      "Easier than paper, more special than an album. Create a beautiful guest experience right from your phone.",
+    heroPrimary: "Try for free",
+    heroSecondary: "View templates",
+    heroNote: "Ready in ~10 minutes · Share via LINE",
+    featureTitle: "Features",
+    featureSubtitle: "Designed for couples and guests.",
+    feature1Title: "Photo-first layouts",
+    feature1Desc: "Large imagery and generous spacing highlight your story.",
+    feature2Title: "Mobile-friendly experience",
+    feature2Desc: "Simple vertical flow with readable text and buttons.",
+    feature3Title: "Share by LINE URL",
+    feature3Desc: "Copy the link and send. No app required.",
+    feature4Title: "Multilingual support",
+    feature4Desc: "Japanese / English / Korean available.",
+    templatesTitle: "Template gallery",
+    templatesSubtitle: "Four styles to match your mood.",
+    template1Title: "Romantic",
+    template1Desc: "Soft florals and airy spacing",
+    template2Title: "Minimal",
+    template2Desc: "Clean and refined",
+    template3Title: "Modern",
+    template3Desc: "Sleek urban feel",
+    template4Title: "Japanese Modern",
+    template4Desc: "Subtle traditional accents",
+    templateView: "Preview",
+    stepsTitle: "How it works",
+    stepsSubtitle: "Done in three steps.",
+    step1Title: "Choose a template",
+    step1Desc: "Start with the style you love.",
+    step2Title: "Add photos and details",
+    step2Desc: "Date, venue, map, RSVP and more.",
+    step3Title: "Share by LINE",
+    step3Desc: "Send the URL to your guests.",
+    priceTitle: "Pricing",
+    priceSubtitle: "Try free, then upgrade when you're ready.",
+    priceFreeTitle: "Free plan",
+    priceFreePrice: "¥0",
+    priceFreeDesc1: "Browse all templates",
+    priceFreeDesc2: "Create and share a sample",
+    priceFreeDesc3: "Watermarked preview",
+    pricePaidTitle: "One-time plan",
+    pricePaidPrice: "¥3,980 (tax incl.)",
+    pricePaidDesc1: "Public URL without watermark",
+    pricePaidDesc2: "Unlimited photo/text edits",
+    pricePaidDesc3: "RSVP, map, LINE share",
+    priceNote: "Prices may change at launch.",
+    faqTitle: "FAQ",
+    faq1Q: "How long will the page stay available?",
+    faq1A:
+      "The page is available for 12 months after publishing. Extensions are planned.",
+    faq2Q: "Do guests need to install an app?",
+    faq2A: "No. They can view it directly in a browser.",
+    faq3Q: "Can I update the content later?",
+    faq3A: "Yes. You can edit photos, text, and details anytime.",
+    faq4Q: "What payment methods are supported?",
+    faq4A: "Credit card payments are being prepared.",
+    faq5Q: "Can I show it in English for overseas guests?",
+    faq5A: "Yes. Japanese/English/Korean can be switched.",
+    ctaTitle: "Ready to start for free?",
+    ctaSubtitle: "It takes one minute to begin. Pick a template first.",
+    ctaPrimary: "Try for free",
   },
   templates: {
     title: "Templates",
