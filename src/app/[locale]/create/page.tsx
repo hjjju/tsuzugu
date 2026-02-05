@@ -1,7 +1,5 @@
 import Link from "next/link";
 
-export const runtime = "edge";
-
 export default function CreateStartPage() {
   return (
     <div className="bg-[#f9f8f6] px-4 pb-16 pt-10">

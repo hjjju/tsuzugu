@@ -1,7 +1,5 @@
 import GuestInviteClient from "./GuestInviteClient";
 
-export const runtime = "edge";
-
 export default async function InvitePage({
   params,
   searchParams,
