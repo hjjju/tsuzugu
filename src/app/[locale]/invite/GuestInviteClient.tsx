@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import { usePathname } from "next/navigation";
 import InviteGuestView, { type InvitationDraft } from "@/components/InviteGuestView";
 import { getDictionary, locales } from "@/lib/i18n";
@@ -21,7 +21,6 @@ export default function GuestInviteClient({
   inviteId?: string;
   encodedData?: string;
 }) {
-  const [inviteData, setInviteData] = useState<InvitationDraft | null>(null);
   const pathname = usePathname() || "/";
   const locale = useMemo(() => {
     const segment = pathname.split("/")[1];
@@ -30,24 +29,23 @@ export default function GuestInviteClient({
       : "jp";
   }, [pathname]);
   const dict = getDictionary(locale).invite;
-
-  useEffect(() => {
+  const inviteData = useMemo(() => {
     if (encodedData) {
-      setInviteData(decodeInvitationData(encodedData));
-      return;
+      return decodeInvitationData(encodedData);
     }
 
     if (typeof window !== "undefined" && inviteId) {
       const stored = window.sessionStorage.getItem(`tsz-invite-${inviteId}`);
       if (stored) {
         try {
-          setInviteData(JSON.parse(stored) as InvitationDraft);
-          return;
+          return JSON.parse(stored) as InvitationDraft;
         } catch {
-          setInviteData(null);
+          return null;
         }
       }
     }
+
+    return null;
   }, [encodedData, inviteId]);
 
   if (!inviteData) {
