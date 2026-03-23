@@ -78,7 +78,7 @@ export default function LocaleHomePage({ params }: { params: { locale: Locale } 
             </p>
             <div className="mt-7 flex w-full flex-col gap-3 sm:flex-row sm:items-center">
               <Link
-                href={`/${params.locale}/create`}
+                href="/create"
                 className="tsz-button-primary w-full sm:w-auto"
               >
                 {dict.home.heroPrimary}
@@ -309,7 +309,7 @@ export default function LocaleHomePage({ params }: { params: { locale: Locale } 
           </p>
           <div className="mt-6 flex justify-center">
             <Link
-              href={`/${params.locale}/create`}
+              href="/create"
               className="flex h-11 items-center justify-center rounded-full bg-white px-6 text-sm font-semibold text-ink"
             >
               {dict.home.ctaPrimary}
