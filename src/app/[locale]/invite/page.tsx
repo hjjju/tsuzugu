@@ -1,10 +1,20 @@
 import { Suspense } from "react";
 import type { Locale } from "@/lib/i18n";
-import { getDictionary } from "@/lib/i18n";
+import { getDictionary, locales } from "@/lib/i18n";
 import InvitePageClient from "./InvitePageClient";
 
-export default function InvitePage({ params }: { params: { locale: Locale } }) {
-  const dict = getDictionary(params.locale).invite;
+export default async function InvitePage({
+  params,
+}: {
+  params: Promise<{ locale: string }> | { locale: string };
+}) {
+  const resolvedParams = await Promise.resolve(params);
+  const normalizedLocale = locales.includes(
+    resolvedParams.locale as (typeof locales)[number]
+  )
+    ? (resolvedParams.locale as (typeof locales)[number])
+    : "jp";
+  const dict = getDictionary(normalizedLocale).invite;
   return (
     <Suspense
       fallback={

@@ -1,5 +1,5 @@
 import type { Locale } from "@/lib/i18n";
-import { getDictionary } from "@/lib/i18n";
+import { getDictionary, locales } from "@/lib/i18n";
 import Link from "next/link";
 
 const templateCards = [
@@ -21,8 +21,18 @@ const templateCards = [
   },
 ];
 
-export default function TemplatesPage({ params }: { params: { locale: Locale } }) {
-  const dict = getDictionary(params.locale);
+export default async function TemplatesPage({
+  params,
+}: {
+  params: Promise<{ locale: string }> | { locale: string };
+}) {
+  const resolvedParams = await Promise.resolve(params);
+  const normalizedLocale = locales.includes(
+    resolvedParams.locale as (typeof locales)[number]
+  )
+    ? (resolvedParams.locale as (typeof locales)[number])
+    : "jp";
+  const dict = getDictionary(normalizedLocale);
   const tags = [
     dict.home.template1Title,
     dict.home.template2Title,
@@ -53,7 +63,7 @@ export default function TemplatesPage({ params }: { params: { locale: Locale } }
                   {tags[index]}
                 </span>
                 <Link
-                  href={`/create?locale=${params.locale}`}
+                  href={`/create?locale=${normalizedLocale}`}
                   className="tsz-button-secondary w-full"
                 >
                   {dict.templates.cta}

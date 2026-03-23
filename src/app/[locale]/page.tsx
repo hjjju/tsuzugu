@@ -1,9 +1,19 @@
 import type { Locale } from "@/lib/i18n";
-import { getDictionary } from "@/lib/i18n";
+import { getDictionary, locales } from "@/lib/i18n";
 import Link from "next/link";
 
-export default function LocaleHomePage({ params }: { params: { locale: Locale } }) {
-  const dict = getDictionary(params.locale);
+export default async function LocaleHomePage({
+  params,
+}: {
+  params: Promise<{ locale: string }> | { locale: string };
+}) {
+  const resolvedParams = await Promise.resolve(params);
+  const normalizedLocale = locales.includes(
+    resolvedParams.locale as (typeof locales)[number]
+  )
+    ? (resolvedParams.locale as (typeof locales)[number])
+    : "jp";
+  const dict = getDictionary(normalizedLocale);
   const features = [
     {
       title: dict.home.feature1Title,
@@ -78,13 +88,13 @@ export default function LocaleHomePage({ params }: { params: { locale: Locale } 
             </p>
             <div className="mt-7 flex w-full flex-col gap-3 sm:flex-row sm:items-center">
               <Link
-                href={`/create?locale=${params.locale}`}
+                href={`/create?locale=${normalizedLocale}`}
                 className="tsz-button-primary w-full sm:w-auto"
               >
                 {dict.home.heroPrimary}
               </Link>
               <Link
-                href={`/${params.locale}/templates`}
+                href={`/${normalizedLocale}/templates`}
                 className="tsz-button-secondary w-full sm:w-auto"
               >
                 {dict.home.heroSecondary}
@@ -176,7 +186,7 @@ export default function LocaleHomePage({ params }: { params: { locale: Locale } 
             {templates.map((template, index) => (
               <Link
                 key={template.title}
-                href={`/${params.locale}/templates`}
+                href={`/${normalizedLocale}/templates`}
                 className="group relative overflow-hidden rounded-3xl border border-black/5 bg-white"
               >
                 <div className="relative h-44 overflow-hidden">
@@ -309,7 +319,7 @@ export default function LocaleHomePage({ params }: { params: { locale: Locale } 
           </p>
           <div className="mt-6 flex justify-center">
             <Link
-              href={`/create?locale=${params.locale}`}
+              href={`/create?locale=${normalizedLocale}`}
               className="flex h-11 items-center justify-center rounded-full bg-white px-6 text-sm font-semibold text-ink"
             >
               {dict.home.ctaPrimary}
