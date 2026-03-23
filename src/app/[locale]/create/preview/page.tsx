@@ -1,9 +1,10 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import InviteGuestView from "@/components/InviteGuestView";
 import { useCreateFlow } from "@/components/CreateFlowProvider";
+import { getDictionary, locales } from "@/lib/i18n";
 
 function encodeInvitationData(data: ReturnType<typeof useCreateFlow>["draft"]) {
   const json = JSON.stringify(data);
@@ -12,6 +13,11 @@ function encodeInvitationData(data: ReturnType<typeof useCreateFlow>["draft"]) {
 
 export default function CreatePreviewPage() {
   const router = useRouter();
+  const params = useParams<{ locale?: string }>();
+  const locale = locales.includes(params.locale as (typeof locales)[number])
+    ? (params.locale as (typeof locales)[number])
+    : "jp";
+  const dict = getDictionary(locale).invite;
   const { draft, ensureInviteId, inviteId, saveDraftToStorage } = useCreateFlow();
   const [copied, setCopied] = useState(false);
 
@@ -45,7 +51,7 @@ export default function CreatePreviewPage() {
           <p className="mt-2 text-sm text-ink/60">ゲストに届く画面のイメージです。</p>
         </div>
 
-        <InviteGuestView data={draft} />
+        <InviteGuestView data={draft} locale={locale} copy={dict} />
 
         <div className="rounded-[2.5rem] border border-black/5 bg-white/80 p-6">
           <label className="text-sm font-semibold text-ink">招待状のリンク</label>

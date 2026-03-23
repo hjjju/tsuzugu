@@ -1,7 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { usePathname } from "next/navigation";
 import InviteGuestView, { type InvitationDraft } from "@/components/InviteGuestView";
+import { getDictionary, locales } from "@/lib/i18n";
 
 function decodeInvitationData(encoded: string): InvitationDraft | null {
   try {
@@ -20,6 +22,14 @@ export default function GuestInviteClient({
   encodedData?: string;
 }) {
   const [inviteData, setInviteData] = useState<InvitationDraft | null>(null);
+  const pathname = usePathname() || "/";
+  const locale = useMemo(() => {
+    const segment = pathname.split("/")[1];
+    return locales.includes(segment as (typeof locales)[number])
+      ? (segment as (typeof locales)[number])
+      : "jp";
+  }, [pathname]);
+  const dict = getDictionary(locale).invite;
 
   useEffect(() => {
     if (encodedData) {
@@ -44,10 +54,10 @@ export default function GuestInviteClient({
     return (
       <div className="bg-[#f9f8f6] px-4 pb-16 pt-10">
         <div className="mx-auto w-full max-w-md rounded-[2.5rem] border border-black/5 bg-white/80 px-6 py-10 text-center shadow-sm">
-          <h1 className="font-display text-2xl text-ink">招待状の読み込みに失敗しました</h1>
-          <p className="mt-3 text-sm text-ink/70">
-            URLが正しいか、作成した端末で開いているかをご確認ください。
-          </p>
+          <h1 className="font-display text-2xl text-ink">
+            {dict.inviteLoadErrorTitle}
+          </h1>
+          <p className="mt-3 text-sm text-ink/70">{dict.inviteLoadErrorBody}</p>
         </div>
       </div>
     );
@@ -55,7 +65,7 @@ export default function GuestInviteClient({
 
   return (
     <div className="bg-[#f9f8f6] px-4 pb-16 pt-10">
-      <InviteGuestView data={inviteData} />
+      <InviteGuestView data={inviteData} locale={locale} copy={dict} />
     </div>
   );
 }

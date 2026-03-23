@@ -49,7 +49,7 @@ export default function TemplatesPage({ params }: { params: { locale: Locale } }
                   {tags[index]}
                 </span>
                 <Link
-                  href="/create"
+                  href={`/create?locale=${params.locale}`}
                   className="tsz-button-secondary w-full"
                 >
                   {dict.templates.cta}

@@ -78,7 +78,7 @@ export default function LocaleHomePage({ params }: { params: { locale: Locale } 
             </p>
             <div className="mt-7 flex w-full flex-col gap-3 sm:flex-row sm:items-center">
               <Link
-                href="/create"
+                href={`/create?locale=${params.locale}`}
                 className="tsz-button-primary w-full sm:w-auto"
               >
                 {dict.home.heroPrimary}
@@ -108,7 +108,7 @@ export default function LocaleHomePage({ params }: { params: { locale: Locale } 
                   <div className="absolute inset-x-6 bottom-6 rounded-2xl bg-white/80 p-4 text-left backdrop-blur">
                     <p className="text-xs text-ink/60">Shun & Haruka</p>
                     <p className="mt-1 font-display text-base text-ink">
-                      ご招待状
+                      {dict.home.heroCardTitle}
                     </p>
                     <p className="mt-2 text-[11px] leading-relaxed text-ink/70">
                       2026.10.12 Sat · 17:00
@@ -119,16 +119,16 @@ export default function LocaleHomePage({ params }: { params: { locale: Locale } 
                 </div>
                 <div className="space-y-3 px-5 py-6 text-left">
                   <div className="rounded-full bg-ink/5 px-3 py-1 text-[11px] text-ink/60">
-                    出欠 / 地図 / メッセージ
+                    {dict.home.heroCardBadge}
                   </div>
                   <p className="text-xs text-ink/70">
-                    スクロールで写真とストーリーを美しく表示。ゲストも迷わず読めます。
+                    {dict.home.heroCardDescription}
                   </p>
                   <button
                     type="button"
                     className="h-10 w-full rounded-full bg-ink text-xs font-semibold text-white"
                   >
-                    出欠の回答
+                    {dict.home.heroCardButton}
                   </button>
                 </div>
               </div>
@@ -309,7 +309,7 @@ export default function LocaleHomePage({ params }: { params: { locale: Locale } 
           </p>
           <div className="mt-6 flex justify-center">
             <Link
-              href="/create"
+              href={`/create?locale=${params.locale}`}
               className="flex h-11 items-center justify-center rounded-full bg-white px-6 text-sm font-semibold text-ink"
             >
               {dict.home.ctaPrimary}

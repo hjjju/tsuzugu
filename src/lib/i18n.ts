@@ -2,12 +2,21 @@ export const locales = ["jp", "ko", "en"] as const;
 export type Locale = (typeof locales)[number];
 
 type InviteCopy = {
+  titleFallback: string;
   greetingTitle: string;
   greetingDefault: string;
   scheduleTitle: string;
   dateLabel: string;
   venueLabel: string;
   addressLabel: string;
+  dressCodeLabel: string;
+  messageTitle: string;
+  cashGiftTitle: string;
+  notesTitle: string;
+  footerNote: string;
+  inviteLoading: string;
+  inviteLoadErrorTitle: string;
+  inviteLoadErrorBody: string;
   rsvpTitle: string;
   rsvpNoticeFallback: string;
   rsvpDeadlineLabel: string;
@@ -211,6 +220,10 @@ type Dictionary = {
     heroPrimary: string;
     heroSecondary: string;
     heroNote: string;
+    heroCardTitle: string;
+    heroCardBadge: string;
+    heroCardDescription: string;
+    heroCardButton: string;
     featureTitle: string;
     featureSubtitle: string;
     feature1Title: string;
@@ -449,6 +462,11 @@ const jp: Dictionary = {
     heroPrimary: "招待状を作る",
     heroSecondary: "テンプレートを見る",
     heroNote: "最短10分で完成・LINEで共有",
+    heroCardTitle: "ご招待状",
+    heroCardBadge: "出欠 / 地図 / メッセージ",
+    heroCardDescription:
+      "スクロールで写真とストーリーを美しく表示。ゲストも迷わず読めます。",
+    heroCardButton: "出欠の回答",
     featureTitle: "特徴",
     featureSubtitle: "ふたりらしさと使いやすさを両立。",
     feature1Title: "写真が主役のWEB招待状",
@@ -516,6 +534,7 @@ const jp: Dictionary = {
     cta: "このテンプレートで作成",
   },
   invite: {
+    titleFallback: "ウェディングパーティー",
     greetingTitle: "ご案内",
     greetingDefault:
       "拝啓　春暖の候、皆様にはますますご清祥のこととお慶び申し上げます。\nこのたび結婚式を挙げる運びとなりました。\n日頃お世話になっている皆様に感謝の気持ちを込めて、ささやかな席を設けております。\nご都合がよろしければぜひご列席賜りますようお願い申し上げます。\n敬具",
@@ -523,6 +542,15 @@ const jp: Dictionary = {
     dateLabel: "日時",
     venueLabel: "会場",
     addressLabel: "住所",
+    dressCodeLabel: "ドレスコード",
+    messageTitle: "メッセージ",
+    cashGiftTitle: "ご祝儀・会費について",
+    notesTitle: "備考",
+    footerNote: "この招待状は Tsuzugu のWeb招待状サービスで作成されています。",
+    inviteLoading: "招待状を読み込み中...",
+    inviteLoadErrorTitle: "招待状の読み込みに失敗しました",
+    inviteLoadErrorBody:
+      "URLが正しいか、作成した端末で開いているかをご確認ください。",
     rsvpTitle: "ご出欠のご回答",
     rsvpNoticeFallback:
       "恐れ入りますが、以下の項目にご記入をお願いいたします。",
@@ -743,6 +771,11 @@ const ko: Dictionary = {
     heroPrimary: "무료로 시작하기",
     heroSecondary: "템플릿 보기",
     heroNote: "10분이면 완성 · LINE 공유",
+    heroCardTitle: "초대장",
+    heroCardBadge: "참석 / 지도 / 메시지",
+    heroCardDescription:
+      "스크롤로 사진과 스토리를 깔끔하게 보여줘요. 게스트도 쉽게 읽을 수 있습니다.",
+    heroCardButton: "참석 여부 응답",
     featureTitle: "특징",
     featureSubtitle: "둘만의 감성과 사용성을 함께.",
     feature1Title: "사진이 주인공인 WEB 초대장",
@@ -807,6 +840,7 @@ const ko: Dictionary = {
     cta: "이 템플릿으로 만들기",
   },
   invite: {
+    titleFallback: "웨딩 파티",
     greetingTitle: "초대의 말씀",
     greetingDefault:
       "삼가 인사드립니다. 따뜻한 봄날, 여러분의 평안과 행복을 기원합니다.\n이제 저희 두 사람은 결혼식을 올리게 되었습니다.\n평소 베풀어주신 은혜에 감사드리며, 작은 자리를 마련하였습니다.\n시간 되실 때 꼭 참석하시어 자리를 빛내주시길 부탁드립니다.\n감사합니다.",
@@ -814,6 +848,15 @@ const ko: Dictionary = {
     dateLabel: "일시",
     venueLabel: "예식장",
     addressLabel: "주소",
+    dressCodeLabel: "드레스 코드",
+    messageTitle: "메시지",
+    cashGiftTitle: "축의금/회비 안내",
+    notesTitle: "비고",
+    footerNote: "이 초대장은 Tsuzugu의 웹 초대장 서비스로 제작되었습니다.",
+    inviteLoading: "초대장을 불러오는 중...",
+    inviteLoadErrorTitle: "초대장 불러오기에 실패했습니다",
+    inviteLoadErrorBody:
+      "URL이 올바른지, 작성한 기기에서 열었는지 확인해 주세요.",
     rsvpTitle: "참석 여부",
     rsvpNoticeFallback:
       "번거로우시겠지만 아래 항목을 작성해 주시길 부탁드립니다.",
@@ -1034,6 +1077,11 @@ const en: Dictionary = {
     heroPrimary: "Try for free",
     heroSecondary: "View templates",
     heroNote: "Ready in ~10 minutes · Share via LINE",
+    heroCardTitle: "Invitation",
+    heroCardBadge: "RSVP / Map / Message",
+    heroCardDescription:
+      "Scroll to view photos and stories beautifully. Guests can read it easily.",
+    heroCardButton: "RSVP",
     featureTitle: "Features",
     featureSubtitle: "Designed for couples and guests.",
     feature1Title: "Photo-first layouts",
@@ -1098,6 +1146,7 @@ const en: Dictionary = {
     cta: "Use this template",
   },
   invite: {
+    titleFallback: "Wedding Party",
     greetingTitle: "Invitation",
     greetingDefault:
       "Dear guests, with the warmth of spring, we wish you continued health and happiness.\nWe are pleased to announce our wedding ceremony.\nWith gratitude for your kindness, we have prepared a small gathering.\nWe would be honored by your presence.\nSincerely.",
@@ -1105,6 +1154,15 @@ const en: Dictionary = {
     dateLabel: "Date & Time",
     venueLabel: "Venue",
     addressLabel: "Address",
+    dressCodeLabel: "Dress code",
+    messageTitle: "Message",
+    cashGiftTitle: "Cash gift / fee",
+    notesTitle: "Notes",
+    footerNote: "This invitation was created with Tsuzugu's web invitation service.",
+    inviteLoading: "Loading invitation...",
+    inviteLoadErrorTitle: "Failed to load invitation",
+    inviteLoadErrorBody:
+      "Please check the URL or open it on the device where it was created.",
     rsvpTitle: "RSVP",
     rsvpNoticeFallback:
       "We kindly ask you to complete the form below.",

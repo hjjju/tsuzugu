@@ -2,6 +2,7 @@
 
 import { useMemo, useRef, useState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { createInvitation } from "@/lib/services/invitations";
 import { getDictionary, locales } from "@/lib/i18n";
 
@@ -86,7 +87,20 @@ const Accordion = ({
 );
 
 export default function CreatePage() {
-  const dict = getDictionary("jp").create;
+  const searchParams = useSearchParams();
+  const resolvedLocale = useMemo(() => {
+    if (typeof window === "undefined") return "jp";
+    const fromQuery = searchParams?.get("locale") ?? "";
+    if (locales.includes(fromQuery as (typeof locales)[number])) {
+      return fromQuery as (typeof locales)[number];
+    }
+    const segment = window.location.pathname.split("/")[1];
+    return locales.includes(segment as (typeof locales)[number])
+      ? (segment as (typeof locales)[number])
+      : "jp";
+  }, [searchParams]);
+
+  const dict = getDictionary(resolvedLocale).create;
   const [activeTab, setActiveTab] = useState("basic");
   const [brideName, setBrideName] = useState("陽菜");
   const [groomName, setGroomName] = useState("健人");
@@ -132,11 +146,7 @@ export default function CreatePage() {
   const [baseUrl] = useState(() =>
     typeof window !== "undefined" ? window.location.origin : ""
   );
-  const [currentLocale] = useState(() => {
-    if (typeof window === "undefined") return "jp";
-    const segment = window.location.pathname.split("/")[1];
-    return locales.includes(segment as (typeof locales)[number]) ? segment : "jp";
-  });
+  const currentLocale = resolvedLocale;
   const [rsvpRequireName, setRsvpRequireName] = useState(true);
   const [rsvpRequireFurigana, setRsvpRequireFurigana] = useState(true);
   const [rsvpAllergyEnabled, setRsvpAllergyEnabled] = useState(true);
@@ -292,12 +302,20 @@ export default function CreatePage() {
 
   return (
     <div className="mx-auto w-full max-w-5xl px-4 pb-24 pt-8">
-      <header className="fade-in space-y-2">
-        <p className="text-xs uppercase tracking-[0.3em] text-ink/50">
-          Tsuzugu Admin
-        </p>
-        <h1 className="text-2xl font-semibold text-ink">{dict.adminTitle}</h1>
-        <p className="text-sm text-ink/60">{dict.adminSubtitle}</p>
+      <header className="fade-in flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="space-y-2">
+          <p className="text-xs uppercase tracking-[0.3em] text-ink/50">
+            Tsuzugu Admin
+          </p>
+          <h1 className="text-2xl font-semibold text-ink">{dict.adminTitle}</h1>
+          <p className="text-sm text-ink/60">{dict.adminSubtitle}</p>
+        </div>
+        <Link
+          href={`/${currentLocale}`}
+          className="inline-flex items-center justify-center rounded-full border border-ink/15 bg-white/80 px-4 py-2 text-sm font-medium text-ink transition-opacity duration-300 hover:opacity-80"
+        >
+          メインへ戻る
+        </Link>
       </header>
 
       <main className="fade-in mt-6 grid gap-6 md:grid-cols-[1.15fr_0.85fr]">
