@@ -1,5 +1,4 @@
 import { Suspense } from "react";
-import type { Locale } from "@/lib/i18n";
 import { getDictionary, locales } from "@/lib/i18n";
 import InvitePageClient from "./InvitePageClient";
 

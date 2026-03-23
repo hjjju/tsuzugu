@@ -1,4 +1,3 @@
-import type { Locale } from "@/lib/i18n";
 import { getDictionary, locales } from "@/lib/i18n";
 import Link from "next/link";
 

@@ -2,7 +2,9 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import { useCreateFlow } from "@/components/CreateFlowProvider";
+import { getDictionary, locales } from "@/lib/i18n";
 
 const requiredFields: Array<keyof ReturnType<typeof useCreateFlow>["draft"]> = [
   "groomName",
@@ -19,6 +21,11 @@ type FieldErrors = Partial<Record<keyof ReturnType<typeof useCreateFlow>["draft"
 
 export default function CreateFormPage() {
   const router = useRouter();
+  const params = useParams<{ locale?: string }>();
+  const locale = locales.includes(params.locale as (typeof locales)[number])
+    ? (params.locale as (typeof locales)[number])
+    : "jp";
+  const dict = getDictionary(locale).create;
   const { draft, updateField } = useCreateFlow();
   const [errors, setErrors] = useState<FieldErrors>({});
   const inputClassName =
@@ -210,10 +217,10 @@ export default function CreateFormPage() {
           </button>
           <button
             type="button"
-            onClick={() => router.push("/jp/create")}
+            onClick={() => router.push(`/${locale}/create`)}
             className="w-full rounded-full border border-ink/20 bg-white px-6 py-3 text-sm font-semibold text-ink sm:flex-1"
           >
-            戻る
+            {dict.backLabel}
           </button>
         </div>
       </div>

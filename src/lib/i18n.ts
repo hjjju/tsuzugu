@@ -116,6 +116,9 @@ type Dictionary = {
   create: {
     adminTitle: string;
     adminSubtitle: string;
+    backToMain: string;
+    backLabel: string;
+    backToTop: string;
     tabBasic: string;
     tabDesign: string;
     tabRsvp: string;
@@ -355,6 +358,9 @@ const jp: Dictionary = {
   create: {
     adminTitle: "招待状を作る",
     adminSubtitle: "丁寧な言葉選びと余白を意識しながら、上質な招待状をお仕立てします。",
+    backToMain: "メインへ戻る",
+    backLabel: "戻る",
+    backToTop: "トップに戻る",
     tabBasic: "基本情報",
     tabDesign: "デザイン",
     tabRsvp: "RSVP設定",
@@ -664,6 +670,9 @@ const ko: Dictionary = {
   create: {
     adminTitle: "초대장 만들기",
     adminSubtitle: "정중한 표현과 여백을 살려 품격 있는 초대장을 제작합니다.",
+    backToMain: "메인으로 돌아가기",
+    backLabel: "돌아가기",
+    backToTop: "홈으로 돌아가기",
     tabBasic: "기본정보",
     tabDesign: "디자인",
     tabRsvp: "RSVP 설정",
@@ -814,7 +823,7 @@ const ko: Dictionary = {
     priceFreeDesc2: "샘플 생성·공유",
     priceFreeDesc3: "워터마크 프리뷰",
     pricePaidTitle: "원타임 플랜",
-    pricePaidPrice: "¥3,980（税込）",
+    pricePaidPrice: "₩21,999",
     pricePaidDesc1: "워터마크 없는 공개 URL",
     pricePaidDesc2: "사진·문구 무제한 수정",
     pricePaidDesc3: "RSVP·지도·LINE 공유",
@@ -970,6 +979,9 @@ const en: Dictionary = {
   create: {
     adminTitle: "Create Invitation",
     adminSubtitle: "Craft a refined invitation with thoughtful wording and spacing.",
+    backToMain: "Back to home",
+    backLabel: "Back",
+    backToTop: "Back to top",
     tabBasic: "Basics",
     tabDesign: "Design",
     tabRsvp: "RSVP",
@@ -1119,7 +1131,7 @@ const en: Dictionary = {
     priceFreeDesc2: "Create and share a sample",
     priceFreeDesc3: "Watermarked preview",
     pricePaidTitle: "One-time plan",
-    pricePaidPrice: "¥3,980 (tax incl.)",
+    pricePaidPrice: "$19.99",
     pricePaidDesc1: "Public URL without watermark",
     pricePaidDesc2: "Unlimited photo/text edits",
     pricePaidDesc3: "RSVP, map, LINE share",

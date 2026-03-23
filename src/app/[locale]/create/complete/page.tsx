@@ -2,12 +2,22 @@
 
 import Link from "next/link";
 import { useMemo } from "react";
+import { useParams } from "next/navigation";
 import { useCreateFlow } from "@/components/CreateFlowProvider";
+import { getDictionary, locales } from "@/lib/i18n";
 
 export default function CreateCompletePage() {
   const { ensureInviteId } = useCreateFlow();
   const inviteId = ensureInviteId();
-  const invitePath = useMemo(() => `/jp/invite?id=${inviteId}`, [inviteId]);
+  const params = useParams<{ locale?: string }>();
+  const locale = locales.includes(params.locale as (typeof locales)[number])
+    ? (params.locale as (typeof locales)[number])
+    : "jp";
+  const dict = getDictionary(locale).create;
+  const invitePath = useMemo(
+    () => `/${locale}/invite?id=${inviteId}`,
+    [inviteId, locale]
+  );
 
   return (
     <div className="bg-[#f9f8f6] px-4 pb-16 pt-10">
@@ -23,10 +33,10 @@ export default function CreateCompletePage() {
             招待状を表示する
           </Link>
           <Link
-            href="/jp"
+            href={`/${locale}`}
             className="w-full rounded-full border border-ink/20 bg-white px-6 py-3 text-sm font-semibold text-ink"
           >
-            トップに戻る
+            {dict.backToTop}
           </Link>
         </div>
       </div>

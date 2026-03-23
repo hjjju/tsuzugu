@@ -24,8 +24,8 @@ export default function CreatePreviewPage() {
   const id = ensureInviteId();
   const invitePath = useMemo(() => {
     const encoded = encodeInvitationData(draft);
-    return `/jp/invite?id=${id}&data=${encoded}`;
-  }, [draft, id]);
+    return `/${locale}/invite?id=${id}&data=${encoded}`;
+  }, [draft, id, locale]);
 
   const handleCopy = async () => {
     try {
