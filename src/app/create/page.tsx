@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { Suspense, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { createInvitation } from "@/lib/services/invitations";
@@ -86,7 +86,7 @@ const Accordion = ({
   </details>
 );
 
-export default function CreatePage() {
+function CreatePageContent() {
   const searchParams = useSearchParams();
   const resolvedLocale = useMemo(() => {
     if (typeof window === "undefined") return "jp";
@@ -1147,5 +1147,21 @@ export default function CreatePage() {
         </div>
       ) : null}
     </div>
+  );
+}
+
+export default function CreatePage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex min-h-[60vh] items-center justify-center bg-[#f9f8f6] px-4">
+          <div className="w-full max-w-md rounded-[2.5rem] border border-black/5 bg-white/80 px-6 py-8 text-center shadow-sm">
+            <p className="text-sm text-ink/70">読み込み中...</p>
+          </div>
+        </div>
+      }
+    >
+      <CreatePageContent />
+    </Suspense>
   );
 }
