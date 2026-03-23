@@ -73,11 +73,15 @@ export default function RsvpTable({
             </div>
             <div className="flex justify-between">
               <span>{labels.allergy}</span>
-              <span>{rsvp.allergyText || "-"}</span>
+              <span className="max-w-[60%] text-right break-words">
+                {rsvp.allergyText || "-"}
+              </span>
             </div>
             <div className="flex justify-between">
               <span>{labels.message}</span>
-              <span className="text-right">{rsvp.messageToCouple || "-"}</span>
+              <span className="max-w-[60%] text-right break-words">
+                {rsvp.messageToCouple || "-"}
+              </span>
             </div>
             <div className="flex justify-between">
               <span>{labels.createdAt}</span>

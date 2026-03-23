@@ -172,7 +172,7 @@ export default function AdminClient({
   }
 
   return (
-    <div className="mx-auto w-full max-w-md px-4 pb-12 pt-8">
+    <div className="mx-auto w-full max-w-md px-4 pb-12 pt-6 sm:max-w-3xl sm:pt-8 lg:max-w-5xl">
       <section className="fade-in space-y-2">
         <p className="text-xs uppercase tracking-[0.3em] text-ink/50">Admin</p>
         <h1 className="text-2xl font-semibold text-ink">{dict.title}</h1>

@@ -18,13 +18,13 @@ export default function CreateCompletePage() {
           <Link
             href={invitePath}
             target="_blank"
-            className="rounded-full bg-ink px-6 py-3 text-sm font-semibold text-white"
+            className="w-full rounded-full bg-ink px-6 py-3 text-sm font-semibold text-white"
           >
             招待状を表示する
           </Link>
           <Link
             href="/jp"
-            className="rounded-full border border-ink/20 bg-white px-6 py-3 text-sm font-semibold text-ink"
+            className="w-full rounded-full border border-ink/20 bg-white px-6 py-3 text-sm font-semibold text-ink"
           >
             トップに戻る
           </Link>

@@ -59,12 +59,12 @@ export default function CreatePreviewPage() {
             <input
               readOnly
               value={`${typeof window !== "undefined" ? window.location.origin : ""}${invitePath}`}
-              className="flex-1 rounded-2xl border border-black/10 bg-white px-4 py-3 text-xs"
+              className="flex-1 rounded-2xl border border-black/10 bg-white px-4 py-3 text-[16px] sm:text-xs"
             />
             <button
               type="button"
               onClick={handleCopy}
-              className="rounded-full bg-ink px-6 py-3 text-xs font-semibold text-white"
+              className="w-full rounded-full bg-ink px-6 py-3 text-xs font-semibold text-white sm:w-auto"
             >
               {copied ? "コピーしました" : "招待状のリンクをコピー"}
             </button>
@@ -76,14 +76,14 @@ export default function CreatePreviewPage() {
           <button
             type="button"
             onClick={handlePublish}
-            className="flex-1 rounded-full bg-ink px-6 py-3 text-sm font-semibold text-white"
+            className="w-full rounded-full bg-ink px-6 py-3 text-sm font-semibold text-white sm:flex-1"
           >
             この内容で公開する
           </button>
           <button
             type="button"
             onClick={() => router.push("../form")}
-            className="flex-1 rounded-full border border-ink/20 bg-white px-6 py-3 text-sm font-semibold text-ink"
+            className="w-full rounded-full border border-ink/20 bg-white px-6 py-3 text-sm font-semibold text-ink sm:flex-1"
           >
             編集に戻る
           </button>

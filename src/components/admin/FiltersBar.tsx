@@ -22,7 +22,7 @@ export default function FiltersBar({ filters, onChange, labels }: FiltersBarProp
   return (
     <div className="space-y-3 rounded-2xl border border-black/5 bg-white/70 p-4">
       <input
-        className="h-11 w-full rounded-2xl border border-ink/15 bg-white/80 px-3 text-sm"
+        className="h-11 w-full rounded-2xl border border-ink/15 bg-white/80 px-3 text-[16px] sm:text-sm"
         placeholder={labels.placeholder}
         value={filters.query}
         onChange={(event) =>
@@ -44,7 +44,7 @@ export default function FiltersBar({ filters, onChange, labels }: FiltersBarProp
                 attendance: item.value as FiltersState["attendance"],
               })
             }
-            className={`h-9 rounded-full border px-4 text-xs transition-opacity duration-300 hover:opacity-80 ${
+            className={`h-9 rounded-full border px-4 text-xs transition-opacity duration-300 hover:opacity-80 sm:text-sm ${
               filters.attendance === item.value
                 ? "border-accent bg-accent/20 text-ink"
                 : "border-ink/20 text-ink/60"
@@ -58,7 +58,7 @@ export default function FiltersBar({ filters, onChange, labels }: FiltersBarProp
           onClick={() =>
             onChange({ ...filters, allergyOnly: !filters.allergyOnly })
           }
-          className={`h-9 rounded-full border px-4 text-xs transition-opacity duration-300 hover:opacity-80 ${
+          className={`h-9 rounded-full border px-4 text-xs transition-opacity duration-300 hover:opacity-80 sm:text-sm ${
             filters.allergyOnly
               ? "border-accent bg-accent/20 text-ink"
               : "border-ink/20 text-ink/60"

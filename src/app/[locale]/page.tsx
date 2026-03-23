@@ -61,11 +61,11 @@ export default function LocaleHomePage({ params }: { params: { locale: Locale } 
 
   return (
     <div className="bg-[#f9f8f6]">
-      <header className="fade-in relative overflow-hidden px-4 pb-16 pt-10 sm:pt-16">
+      <header className="fade-in relative overflow-hidden px-4 pb-16 pt-8 sm:pt-16">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,#fff6ef,transparent_60%)]" />
         <div className="absolute -left-10 top-10 h-44 w-44 rounded-full bg-[#f3e6df] blur-3xl motion-safe:animate-[drift_16s_ease-in-out_infinite]" />
         <div className="absolute -right-10 bottom-10 h-52 w-52 rounded-full bg-[#e9f1f4] blur-3xl motion-safe:animate-[drift_18s_ease-in-out_infinite]" />
-        <div className="relative mx-auto flex min-h-[calc(100svh-96px)] w-full max-w-6xl flex-col items-center gap-10 text-center sm:flex-row sm:items-center sm:justify-between sm:text-left">
+        <div className="relative mx-auto flex min-h-[calc(100svh-72px)] w-full max-w-6xl flex-col items-center gap-8 text-center sm:min-h-[calc(100svh-96px)] sm:flex-row sm:items-center sm:justify-between sm:gap-12 sm:text-left">
           <div className="w-full max-w-xl">
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-ink/60">
               {dict.home.heroKicker}
@@ -92,11 +92,11 @@ export default function LocaleHomePage({ params }: { params: { locale: Locale } 
             </div>
             <p className="mt-3 text-xs text-ink/60">{dict.home.heroNote}</p>
           </div>
-          <div className="w-full max-w-sm sm:max-w-md">
-            <div className="relative mx-auto w-[280px] sm:w-[320px]">
+          <div className="w-full max-w-[320px] sm:max-w-[360px]">
+            <div className="relative mx-auto w-full">
               <div className="absolute -inset-6 rounded-[3rem] bg-white/70 blur-2xl" aria-hidden />
               <div className="relative overflow-hidden rounded-[2.5rem] border border-black/10 bg-white shadow-[0_20px_60px_rgba(0,0,0,0.12)]">
-                <div className="relative aspect-[9/19] overflow-hidden">
+                <div className="relative aspect-[9/17] overflow-hidden sm:aspect-[9/19]">
                   {/* TODO: Replace with real hero image or mock invitation screenshot */}
                   <div
                     className="absolute inset-0 bg-cover bg-center"
@@ -110,7 +110,7 @@ export default function LocaleHomePage({ params }: { params: { locale: Locale } 
                     <p className="mt-1 font-display text-base text-ink">
                       {dict.home.heroCardTitle}
                     </p>
-                    <p className="mt-2 text-[11px] leading-relaxed text-ink/70">
+                    <p className="mt-2 text-[10px] leading-relaxed text-ink/70 sm:text-[11px]">
                       2026.10.12 Sat · 17:00
                       <br />
                       Tokyo Bay Hall
@@ -118,10 +118,10 @@ export default function LocaleHomePage({ params }: { params: { locale: Locale } 
                   </div>
                 </div>
                 <div className="space-y-3 px-5 py-6 text-left">
-                  <div className="rounded-full bg-ink/5 px-3 py-1 text-[11px] text-ink/60">
+                  <div className="rounded-full bg-ink/5 px-3 py-1 text-[10px] text-ink/60 sm:text-[11px]">
                     {dict.home.heroCardBadge}
                   </div>
-                  <p className="text-xs text-ink/70">
+                  <p className="text-xs text-ink/70 sm:text-sm">
                     {dict.home.heroCardDescription}
                   </p>
                   <button

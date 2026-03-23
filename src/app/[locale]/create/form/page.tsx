@@ -21,6 +21,10 @@ export default function CreateFormPage() {
   const router = useRouter();
   const { draft, updateField } = useCreateFlow();
   const [errors, setErrors] = useState<FieldErrors>({});
+  const inputClassName =
+    "w-full rounded-2xl border border-black/10 bg-white px-4 py-3 text-[16px] leading-relaxed sm:text-sm";
+  const textareaClassName =
+    "w-full rounded-2xl border border-black/10 bg-white px-4 py-3 text-[16px] leading-relaxed sm:text-sm";
 
   const stepsNote = useMemo(
     () => "この招待状では、後から出欠やアレルギーなどの回答を受け取れます。",
@@ -60,7 +64,7 @@ export default function CreateFormPage() {
               value={draft.groomName}
               onChange={(event) => updateField("groomName", event.target.value)}
               placeholder="山田 太郎"
-              className="w-full rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm"
+              className={inputClassName}
             />
             {errors.groomName && (
               <p className="text-xs text-red-500">{errors.groomName}</p>
@@ -73,7 +77,7 @@ export default function CreateFormPage() {
               value={draft.brideName}
               onChange={(event) => updateField("brideName", event.target.value)}
               placeholder="佐藤 花子"
-              className="w-full rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm"
+              className={inputClassName}
             />
             {errors.brideName && (
               <p className="text-xs text-red-500">{errors.brideName}</p>
@@ -86,7 +90,7 @@ export default function CreateFormPage() {
               value={draft.title}
               onChange={(event) => updateField("title", event.target.value)}
               placeholder="結婚パーティー / 二次会"
-              className="w-full rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm"
+              className={inputClassName}
             />
             {errors.title && <p className="text-xs text-red-500">{errors.title}</p>}
           </div>
@@ -98,7 +102,7 @@ export default function CreateFormPage() {
                 type="date"
                 value={draft.date}
                 onChange={(event) => updateField("date", event.target.value)}
-                className="w-full rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm"
+                className={inputClassName}
               />
               {errors.date && <p className="text-xs text-red-500">{errors.date}</p>}
             </div>
@@ -108,7 +112,7 @@ export default function CreateFormPage() {
                 type="time"
                 value={draft.time}
                 onChange={(event) => updateField("time", event.target.value)}
-                className="w-full rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm"
+                className={inputClassName}
               />
               {errors.time && <p className="text-xs text-red-500">{errors.time}</p>}
             </div>
@@ -120,7 +124,7 @@ export default function CreateFormPage() {
               value={draft.venueName}
               onChange={(event) => updateField("venueName", event.target.value)}
               placeholder="表参道 ◯◯◯"
-              className="w-full rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm"
+              className={inputClassName}
             />
             {errors.venueName && (
               <p className="text-xs text-red-500">{errors.venueName}</p>
@@ -133,7 +137,7 @@ export default function CreateFormPage() {
               value={draft.venueAddress}
               onChange={(event) => updateField("venueAddress", event.target.value)}
               placeholder="東京都渋谷区〇〇〇"
-              className="w-full rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm"
+              className={inputClassName}
             />
             {errors.venueAddress && (
               <p className="text-xs text-red-500">{errors.venueAddress}</p>
@@ -147,7 +151,7 @@ export default function CreateFormPage() {
               onChange={(event) => updateField("message", event.target.value)}
               placeholder="ゲストへのご案内文を入力してください。"
               rows={4}
-              className="w-full rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm"
+              className={textareaClassName}
             />
             {errors.message && (
               <p className="text-xs text-red-500">{errors.message}</p>
@@ -160,7 +164,7 @@ export default function CreateFormPage() {
               value={draft.dressCode}
               onChange={(event) => updateField("dressCode", event.target.value)}
               placeholder="スマートカジュアル"
-              className="w-full rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm"
+              className={inputClassName}
             />
           </div>
 
@@ -173,7 +177,7 @@ export default function CreateFormPage() {
               onChange={(event) => updateField("cashGiftNote", event.target.value)}
               placeholder="当日現金でも、事前にPayPayでの送金でも大丈夫です。ご都合の良い方法でお気持ちを頂けたら嬉しいです。"
               rows={3}
-              className="w-full rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm"
+              className={textareaClassName}
             />
             <p className="text-xs text-ink/50">
               当日現金でもOK、PayPay/銀行振込は任意で選べます。
@@ -187,7 +191,7 @@ export default function CreateFormPage() {
               onChange={(event) => updateField("notes", event.target.value)}
               placeholder="途中参加・途中退出OKなど"
               rows={3}
-              className="w-full rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm"
+              className={textareaClassName}
             />
           </div>
 
@@ -200,14 +204,14 @@ export default function CreateFormPage() {
           <button
             type="button"
             onClick={handleSubmit}
-            className="flex-1 rounded-full bg-ink px-6 py-3 text-sm font-semibold text-white"
+            className="w-full rounded-full bg-ink px-6 py-3 text-sm font-semibold text-white sm:flex-1"
           >
             プレビューを見る
           </button>
           <button
             type="button"
             onClick={() => router.push("/jp/create")}
-            className="flex-1 rounded-full border border-ink/20 bg-white px-6 py-3 text-sm font-semibold text-ink"
+            className="w-full rounded-full border border-ink/20 bg-white px-6 py-3 text-sm font-semibold text-ink sm:flex-1"
           >
             戻る
           </button>

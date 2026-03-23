@@ -31,17 +31,21 @@ export default function TemplatesPage({ params }: { params: { locale: Locale } }
   ];
 
   return (
-    <div className="bg-[#f9f8f6] px-4 pb-16 pt-12">
-      <div className="mx-auto w-full max-w-4xl space-y-8">
+    <div className="bg-[#f9f8f6] px-4 pb-16 pt-10 sm:pt-12">
+      <div className="mx-auto w-full max-w-4xl space-y-6 sm:space-y-8">
         <div className="space-y-2 text-center">
-          <h1 className="font-display text-2xl text-ink">{dict.templates.title}</h1>
-          <p className="text-sm text-ink/60">{dict.templates.subtitle}</p>
+          <h1 className="font-display text-2xl text-ink sm:text-3xl">
+            {dict.templates.title}
+          </h1>
+          <p className="text-sm text-ink/60 sm:text-base">
+            {dict.templates.subtitle}
+          </p>
         </div>
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {templateCards.map((card, index) => (
             <div key={card.key} className="tsz-card overflow-hidden">
               <div
-                className="h-48 bg-cover bg-center"
+                className="h-44 bg-cover bg-center sm:h-48"
                 style={{ backgroundImage: card.gradient }}
               />
               <div className="space-y-3 p-4">

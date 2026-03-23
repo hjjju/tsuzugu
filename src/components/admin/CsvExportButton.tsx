@@ -69,7 +69,7 @@ export default function CsvExportButton({
     <button
       type="button"
       onClick={handleExport}
-      className="flex h-11 items-center justify-center rounded-full border border-ink/20 bg-white px-4 text-sm font-medium text-ink transition-opacity duration-300 hover:opacity-80"
+      className="flex h-11 w-full items-center justify-center rounded-full border border-ink/20 bg-white px-4 text-sm font-medium text-ink transition-opacity duration-300 hover:opacity-80 sm:w-auto"
     >
       {label}
     </button>

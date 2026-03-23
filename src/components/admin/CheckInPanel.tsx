@@ -37,16 +37,16 @@ export default function CheckInPanel({
           </span>
         ) : null}
       </div>
-      <form className="mt-3 flex gap-2" onSubmit={handleSubmit}>
+      <form className="mt-3 flex flex-col gap-2 sm:flex-row" onSubmit={handleSubmit}>
         <input
-          className="h-11 flex-1 rounded-2xl border border-ink/15 bg-white/80 px-3 text-sm"
+          className="h-11 w-full flex-1 rounded-2xl border border-ink/15 bg-white/80 px-3 text-[16px] sm:text-sm"
           placeholder={labels.placeholder}
           value={qrToken}
           onChange={(event) => setQrToken(event.target.value)}
         />
         <button
           type="submit"
-          className="h-11 rounded-2xl bg-accent px-4 text-sm font-semibold text-white transition-opacity duration-300 hover:opacity-80 disabled:opacity-40"
+          className="h-11 w-full rounded-2xl bg-accent px-4 text-sm font-semibold text-white transition-opacity duration-300 hover:opacity-80 disabled:opacity-40 sm:w-auto"
           disabled={isSubmitting}
         >
           {labels.button}
